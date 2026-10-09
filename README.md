@@ -10,26 +10,28 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file / 940651-byte set, not the C06a subset.
+catalogs the intended complete 56-file / 940651-byte set, not the C06b subset.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
 these files; Full is the default and `?variant=mini` selects Mini. The canvas
 “Idle mini” label does not make this a Mini-only component.
-C06a is a partial Explorer model/effects import: six whole unchanged originals
-(152080 bytes) under `app/src/main/assets/scenes/explorer/js/`: `config.js`,
-`math.js`, `earth.js`, `glyphs.js`, `rings.js` and `rising-sparks.js`.
-The cumulative candidate is 20 originals / 476646 bytes (19 text, one TTF).
-Explorer's `index.html`, `styles.css`, `js/animate.js`, `js/main.js`,
-`js/render-loop.js` and `js/see-through-hook.js` await C06b (57160 bytes);
-30 processing/raphael files / 406845 bytes also remain out.
-No Explorer HTML, CSS, drivers or qrc CSP are included; these JS are not executed.
-Closure awaits C06b and Android integration C13, not a working Full/Mini claim.
+C06b completes the whole unchanged Explorer component under
+`app/src/main/assets/scenes/explorer/`: 12 text files / 209240 bytes / 3665 lines.
+It adds `index.html`, `styles.css`, `js/animate.js`, `js/main.js`,
+`js/render-loop.js` and `js/see-through-hook.js` (57160 bytes / 1074 lines)
+to C06a's six model/effects JS files. Full/Mini share these files, not a Mini-only
+canvas: Full is default; query or hash `variant=mini` selects Mini; `fps=30`
+selects 30 fps, otherwise 60. Static closure covers ten JS files, CSS and existing
+shared overlay/font, with no observed idle dependency; it is not dynamic proof.
+The candidate is 26 originals / 533806 bytes (25 text, one TTF);
+30 processing/raphael files / 406845 bytes remain out. Entry/driver closure is
+complete, but JS is not executed; Android runtime integration awaits C13.
 The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
 these natural components, not native-code budgets or public JavaScript licensing.
-Idle's original qrc-only CSP (`idle/index.html:5`) is retained; import does not
-establish Android rendering compatibility. Static references cover all nine JS
+Original qrc-only CSPs (`idle/index.html:5`, `explorer/index.html:5`) remain; import does not
+establish Android rendering compatibility. Idle's static references cover all nine JS
 files, CSS, shared alert overlay and Archivo Black/OFL; this bounded dependency
 closure is not dynamic runtime proof.
 
@@ -70,10 +72,14 @@ these byte checks are separate from host tests, which are not asset coverage.
 The non-writing I01 check confirmed exact tested source/index identity after the
 verifier's initial `git write-tree` call. Earlier Git metadata immutability is
 unverified; no source/staging mutation was observed. That check reran no builds.
-C06a's four isolated checks passed: eight fresh host tests (seven functional),
+Historical C06a: four isolated checks passed: eight fresh host tests (seven functional),
 no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
 20 originals against committed upstream, catalog and APK; source/index unchanged.
 Shared Git object mtimes changed later without byte changes; writer is unproven.
+C06b's four isolated checks passed: eight fresh host tests (seven functional),
+no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
+26 originals against committed upstream, catalog and APK; source/index unchanged.
+Component import alone proves neither Full visual behavior nor GPU compatibility.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
 Final UI documentation restoration belongs to C13/C14, not this slice.
 
