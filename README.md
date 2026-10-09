@@ -10,12 +10,21 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file asset set, not the packaged C04 subset.
-The 53 scene-specific resources and entrypoints are not yet in the committed
-slice; the shared resources are not integrated with the launcher.
+catalogs the intended complete 56-file / 940651-byte set, not the C05 subset.
+C05 adds the whole original idle Full/Mini component: 11 unchanged text files
+(175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
+these files; Full is the default and `?variant=mini` selects Mini. The canvas
+“Idle mini” label does not make this a Mini-only component. Together with C04,
+the candidate contains 14 originals / 324566 bytes (13 text files, one TTF);
+the remaining 42 explorer/processing/raphael files are not imported.
+The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
 these natural components, not native-code budgets or public JavaScript licensing.
+Idle's original qrc-only CSP (`idle/index.html:5`) is retained; import does not
+establish Android rendering compatibility. Static references cover all nine JS
+files, CSS, shared alert overlay and Archivo Black/OFL; this bounded dependency
+closure is not dynamic runtime proof.
 
 ## Build and verification
 
@@ -42,11 +51,18 @@ is not execution. With an authorized API 35+ device, run
 large fonts, insets, scrolling, rotation and lifecycle. No device/AVD acceptance
 has been established.
 
-C04 isolated provenance, packaging and four build/test checks passed: eight fresh
+Historical C04 only: isolated provenance, packaging and four checks passed: eight fresh
 host tests (seven functional), no failures/errors/skips; lint 0 errors/34 warnings.
 The tests are not asset coverage: separate byte checks match the three originals
 against committed upstream, the catalog and the production APK. `OFL.txt:21`
-retains upstream whitespace; the whole-tree whitespace check reports it.
+retains upstream whitespace; C04's staged-change whitespace check exited 2.
+C05 isolated provenance, packaging and four checks passed: eight fresh host tests
+(seven functional), no failures/errors/skips; lint 0 errors/34 warnings.
+All 14 originals match the catalog, committed upstream and production APK bytes;
+these byte checks are separate from host tests, which are not asset coverage.
+A non-writing integrity check confirmed the tested source and index after the
+verifier's initial `git write-tree` call. Earlier Git metadata immutability is
+unverified; no source/staging mutation was observed. That check reran no builds.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
 
 ## Scope and distribution limits

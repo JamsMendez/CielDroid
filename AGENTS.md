@@ -3,11 +3,14 @@
 C03 adds settings/domain, preferences persistence and ViewModel foundations to
 C02's Compose launcher and scene-name catalog. User-facing settings controls,
 preview rendering, overlay, wallpaper and widget integration remain out of scope.
-C04 adds only three unmodified original shared resources and the intended full
-56-file inventory catalog; the 53 scene-specific resources/entrypoints remain
-outside the committed slice. Shared resources are not integrated with the catalog
-launcher. Future untracked files must survive; they are not verification for
-this slice.
+C04 added three original shared resources; C05 adds the whole unchanged idle
+Full/Mini component (11 text files, 175960 bytes), not a Mini-only scene.
+Full is default; `?variant=mini` selects Mini in the same files. The cumulative
+candidate is 14 originals / 324566 bytes (13 text, one TTF), not the intended
+56-file / 940651-byte catalog; 42 explorer/processing/raphael files remain out.
+The launcher stays catalog-only. Retain the qrc-only CSP at `idle/index.html:5`;
+static dependency closure is not runtime proof or Android compatibility.
+Future untracked files must survive; they are not verification for this slice.
 
 ## Change boundaries
 
@@ -29,7 +32,13 @@ four checks passed: eight fresh host tests (seven functional), no failures,
 errors or skips and lint 0 errors/34 warnings. C04's four checks also passed;
 eight fresh tests (seven functional) are not asset coverage. Separate checks match
 the three originals against committed upstream, catalog and production APK bytes.
-Keep inherited `OFL.txt:21` whitespace: the whole-tree whitespace check reports it.
+Keep inherited `OFL.txt:21` whitespace: C04's staged-change check exited 2.
+C04 evidence is historical. C05's four checks passed: eight fresh tests (seven
+functional), no failures/errors/skips; lint 0 errors/34 warnings. Separate byte
+checks match all 14 originals against committed upstream, catalog and APK.
+Non-writing checks confirmed source/index identity after an initial `write-tree`;
+prior Git metadata immutability is unknown. No source/staging mutation was observed.
+The font OFL is not a JS license grant; vendor exceptions do not waive native caps.
 The full asset verifier requires all 56 files and first applies at C09.
 The arithmetic example is not functional.
 Build output and test APK assembly do not prove device behavior. Report failures
