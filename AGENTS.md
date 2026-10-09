@@ -1,7 +1,8 @@
 # CielDroid bootstrap constraints
 
-This milestone is a Compose launcher and scene-name catalog only. Preview,
-settings, overlay, wallpaper and widget integration remain outside C02.
+C03 adds settings/domain, preferences persistence and ViewModel foundations to
+C02's Compose launcher and scene-name catalog. User-facing settings controls,
+preview rendering, overlay, wallpaper and widget integration remain out of scope.
 Future untracked files must survive; they are not verification for this slice.
 
 ## Change boundaries
@@ -19,8 +20,9 @@ Future untracked files must survive; they are not verification for this slice.
 
 Use the wrapper commands in [README](README.md) against the isolated candidate,
 not ambient future sources. JDK 25 is required for the daemon; a JDK 26 launcher
-also works. SDK platform 37 / Build Tools 36.0.0 are required. C02 checks
-passed; example tests are not functional bootstrap coverage. Build output
+also works. SDK platform 37 / Build Tools 36.0.0 are required. C03's four checks
+passed: eight fresh host tests (seven functional), no failures/errors/skips and
+lint 0 errors/34 warnings. The arithmetic example is not functional. Build output
 and test APK assembly do not prove device behavior. Report failures and skipped
 checks explicitly. Device launch, accessibility and lifecycle remain pending.
 Public toolchain stability, upstream distribution licensing and remote CI are

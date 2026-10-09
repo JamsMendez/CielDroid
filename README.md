@@ -2,8 +2,10 @@
 
 C02 provides an Android 15+ (`minSdk 35`) launcher and a text catalog of the
 four original FULL CieLinux scenes: processing, explorer, idle and raphael.
-Preview integration is pending. There is no renderer, scene selection, persisted
-settings, wallpaper, overlay or widget behavior in this milestone.
+C03 adds scene/settings domain models, preferences persistence and ViewModel
+foundations. The launcher remains a standalone catalog: no user-facing settings
+controls, scene selection or preview rendering is integrated. Wallpaper, overlay
+and widget behavior remain out of scope.
 
 ## Build and verification
 
@@ -19,10 +21,12 @@ Compose compiler matches Kotlin, independently of the Compose BOM.
 ./gradlew :app:assembleDebugAndroidTest
 ```
 
-The four isolated C02 checks passed. Later untracked source, tests and assets
-are preserved, but are not evidence for this slice. The example host test is
-arithmetic, not application-functional coverage; test APK compilation is not
-execution. With an authorized API 35+ device, run
+The four isolated C03 checks passed, including eight freshly executed host tests:
+seven functional domain/repository/ViewModel tests and one arithmetic example.
+There were no test failures, errors or skips; lint reported 0 errors/34 warnings.
+The arithmetic example is not functional coverage. Later untracked source,
+tests and assets are preserved, but are not evidence for C03. Test APK compilation
+is not execution. With an authorized API 35+ device, run
 `./gradlew :app:connectedDebugAndroidTest` and check launch, light/dark themes,
 large fonts, insets, scrolling, rotation and lifecycle. No device/AVD acceptance
 has been established.
