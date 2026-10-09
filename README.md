@@ -10,13 +10,20 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file / 940651-byte set, not the C05 subset.
+catalogs the intended complete 56-file / 940651-byte set, not the C06a subset.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
 these files; Full is the default and `?variant=mini` selects Mini. The canvas
-“Idle mini” label does not make this a Mini-only component. Together with C04,
-the candidate contains 14 originals / 324566 bytes (13 text files, one TTF);
-the remaining 42 explorer/processing/raphael files are not imported.
+“Idle mini” label does not make this a Mini-only component.
+C06a is a partial Explorer model/effects import: six whole unchanged originals
+(152080 bytes) under `app/src/main/assets/scenes/explorer/js/`: `config.js`,
+`math.js`, `earth.js`, `glyphs.js`, `rings.js` and `rising-sparks.js`.
+The cumulative candidate is 20 originals / 476646 bytes (19 text, one TTF).
+Explorer's `index.html`, `styles.css`, `js/animate.js`, `js/main.js`,
+`js/render-loop.js` and `js/see-through-hook.js` await C06b (57160 bytes);
+30 processing/raphael files / 406845 bytes also remain out.
+No Explorer HTML, CSS, drivers or qrc CSP are included; these JS are not executed.
+Closure awaits C06b and Android integration C13, not a working Full/Mini claim.
 The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
@@ -29,7 +36,7 @@ closure is not dynamic runtime proof.
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK platform 37 / Build Tools 36.0.0.
-The daemon criterion requires JDK 25; a local JDK 26 launcher also works.
+The daemon requires JDK 25; JDK 26 launcher compatibility is historical evidence.
 Gradle 9.6.0 / AGP 9.4.1 are pinned. AGP uses built-in Kotlin 2.2.10; the
 Compose compiler matches Kotlin, independently of the Compose BOM.
 
@@ -49,21 +56,26 @@ tests and assets are preserved, but are not evidence for C03. Test APK compilati
 is not execution. With an authorized API 35+ device, run
 `./gradlew :app:connectedDebugAndroidTest` and check launch, light/dark themes,
 large fonts, insets, scrolling, rotation and lifecycle. No device/AVD acceptance
-has been established.
+has been established; GPU, accessibility and lifecycle acceptance remain pending.
 
 Historical C04 only: isolated provenance, packaging and four checks passed: eight fresh
 host tests (seven functional), no failures/errors/skips; lint 0 errors/34 warnings.
 The tests are not asset coverage: separate byte checks match the three originals
 against committed upstream, the catalog and the production APK. `OFL.txt:21`
 retains upstream whitespace; C04's staged-change whitespace check exited 2.
-C05 isolated provenance, packaging and four checks passed: eight fresh host tests
+Historical C05: provenance, packaging and four checks passed: eight fresh host tests
 (seven functional), no failures/errors/skips; lint 0 errors/34 warnings.
 All 14 originals match the catalog, committed upstream and production APK bytes;
 these byte checks are separate from host tests, which are not asset coverage.
-A non-writing integrity check confirmed the tested source and index after the
+The non-writing I01 check confirmed exact tested source/index identity after the
 verifier's initial `git write-tree` call. Earlier Git metadata immutability is
 unverified; no source/staging mutation was observed. That check reran no builds.
+C06a's four isolated checks passed: eight fresh host tests (seven functional),
+no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
+20 originals against committed upstream, catalog and APK; source/index unchanged.
+Shared Git object mtimes changed later without byte changes; writer is unproven.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
+Final UI documentation restoration belongs to C13/C14, not this slice.
 
 ## Scope and distribution limits
 
