@@ -77,6 +77,50 @@ class PreferencesSettingsRepositoryTest {
         } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
     }
 
+    @Test fun wallpaperKeysAreIndependentOfPreviewKeys() = runTest {
+        val file = testFile()
+        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        try {
+            val repo = PreferencesSettingsRepository(store, scope)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY), repo.state.value.wallpaper)
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            repo.setWallpaperScene(SceneId.RAPHAEL)
+            repo.setWallpaperFps(PreviewFps.SIXTY)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
+            assertEquals(PreviewSettings(), repo.state.value.settings)
+            val stored = store.updateData { it }
+            assertEquals("raphael", stored[stringPreferencesKey("wallpaper_scene")])
+            assertEquals(60, stored[intPreferencesKey("wallpaper_fps")])
+            assertNull(stored[stringPreferencesKey("preview_scene")])
+            assertNull(stored[intPreferencesKey("preview_fps")])
+            repo.setScene(SceneId.EXPLORER)
+            repo.setFps(PreviewFps.SIXTY)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.settings)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
+            // Unknown values and wrong types fall back to the wallpaper default, not the preview one.
+            store.edit {
+                it[stringPreferencesKey("wallpaper_scene")] = "../unknown"
+                it[intPreferencesKey("wallpaper_fps")] = 45
+            }
+            advanceUntilIdle()
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            store.edit {
+                it.remove(stringPreferencesKey("wallpaper_scene"))
+                it.remove(intPreferencesKey("wallpaper_fps"))
+                it[intPreferencesKey("wallpaper_scene")] = 1
+                it[stringPreferencesKey("wallpaper_fps")] = "60"
+            }
+            advanceUntilIdle()
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.settings)
+            assertNull(repo.state.value.error)
+        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
+    }
+
     @Test fun corruptedPreferenceFileIsAnObservableErrorNotLoadedDefaults() = runTest {
         val file = testFile()
         file.writeBytes(byteArrayOf(-1, -1, -1))
@@ -119,6 +163,11 @@ class PreferencesSettingsRepositoryTest {
         catch (e: IOException) { assertSame(failure, e) }
         try { repo.setScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
         catch (e: IOException) { assertSame(failure, e) }
+        try { repo.setWallpaperScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        try { repo.setWallpaperFps(PreviewFps.SIXTY); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
         assertEquals(PreviewSettings(), repo.state.value.settings)
+        assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
     }
 }

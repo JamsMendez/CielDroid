@@ -120,6 +120,13 @@ pause, surface/engine destroy released the display; no FATAL/CSP/Uncaught/WebGL 
 preview stayed portrait, so surface resize/landscape is unexercised. `DisplayPlanTest` RED→GREEN;
 engine lifecycle is device-only. Cost/cadence/applied engine are W02/W03; single device.
 
+W04a: generation build uses a `Teardown` release stack (reverse-order release on partial failure,
+no generation left); surface changes resize the VirtualDisplay in place (`DisplayPlan.SwapSurface`
+for a new Surface object), keeping the Presentation/WebView. Independent `wallpaper_scene` /
+`wallpaper_fps` keys (default idle/30) share the `preview` DataStore; the repository and ViewModel
+expose them, with no UI yet (W04b). The engine follows them and rebuilds its generation on change.
+FPS/energy/landscape remain unmeasured (deferred by user); single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.
