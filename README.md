@@ -141,6 +141,17 @@ automated visual/pixel, cadence or accessibility proof; accessibility, cadence m
 security audit, licensing, remote CI and publishing remain pending. C15 closed at
 `c36b0dc` (native approved).
 
+F01b fixes two C13 lifecycle advisories in `ScenePreview`. The owner observer now signals
+`ownerResumed(resumed && inViewport)` in both directions immediately, so a pause/resume pair
+coalesced before recomposition no longer leaves the preview paused; the effect applies pauses
+before resumes, so a same-frame manual unpause plus viewport exit cannot transiently resume.
+The viewport exposes `stateDescription` running/paused (semantics only, no new control).
+`ScenePreviewLifecycleTest` drives a `LifecycleRegistry` owner: before the fix the coalesced
+STARTED→RESUMED test failed its assertion (expected running, actual paused); after it, both
+tests passed and full `am instrument` gave OK (5 tests) on the same API 35 phone, with no app
+FATAL/Uncaught/CSP logcat lines. The viewport-exit ordering is reasoned, not separately tested.
+Single device only; readiness and state semantics are not pixel, GPU or cadence proof.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

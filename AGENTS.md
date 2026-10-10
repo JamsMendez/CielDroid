@@ -95,6 +95,14 @@ Known deferred issue: element scale/sizing on phone (upstream desktop-sized layo
 automated visual/pixel, cadence or accessibility proof; accessibility, cadence, security
 audit, licensing, remote CI and publishing remain pending. C15 closed at `c36b0dc` (native approved).
 
+F01b closes C13 advisories R3-lifecycle-resume-coalescing and R3-lifecycle-viewport-unproved:
+the ScenePreview observer signals `ownerResumed(resumed && inViewport)` both ways immediately and
+the effect applies pauses before resumes; the viewport exposes `stateDescription` running/paused.
+`ScenePreviewLifecycleTest` (LifecycleRegistry owner) RED: coalesced STARTED→RESUMED asserted
+running, actual paused; GREEN after fix; full `am instrument` OK (5 tests) on the API 35 phone,
+no app FATAL/Uncaught/CSP logcat. Viewport-exit ordering is not separately tested. Single device;
+readiness/state semantics are not pixels/GPU/cadence proof.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

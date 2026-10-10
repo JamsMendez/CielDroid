@@ -12,6 +12,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import com.jamsmendez.cieldroid.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -45,8 +47,9 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
     DisposableEffect(lifecycle, controller) {
         val observer = LifecycleEventObserver { _, _ ->
             resumed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-            // Immediate background pause, without waiting for recomposition.
-            if (!resumed) controller.ownerResumed(false)
+            // Immediate pause and resume, without waiting for recomposition: a pause/resume
+            // pair coalesced before the next frame would leave the effect keys unchanged.
+            controller.ownerResumed(resumed && inViewport)
         }
         lifecycle.addObserver(observer)
         onDispose {
@@ -55,8 +58,11 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
         }
     }
     LaunchedEffect(resumed, inViewport, manuallyPaused) {
+        val visible = resumed && inViewport
+        // Apply pauses before resumes so no input change transiently resumes the scene.
+        if (!visible) controller.ownerResumed(false)
         controller.manualPause(manuallyPaused)
-        controller.ownerResumed(resumed && inViewport)
+        controller.ownerResumed(visible)
     }
     Column {
         Text(
@@ -72,6 +78,8 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
         AndroidView(
             factory = { runtime.view.also { runtime.load() } },
             modifier = Modifier.fillMaxWidth().height(300.dp).testTag("scene-viewport")
+                // Test-observable owner state; not a visible control.
+                .semantics { stateDescription = if (session.ownerResumed) "running" else "paused" }
                 .onGloballyPositioned { coordinates ->
                     val bounds = coordinates.boundsInRoot()
                     val root = coordinates.findRootCoordinates().size
