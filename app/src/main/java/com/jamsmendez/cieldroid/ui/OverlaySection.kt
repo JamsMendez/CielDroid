@@ -6,11 +6,14 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -22,6 +25,9 @@ import com.jamsmendez.cieldroid.overlay.MiniOverlayService
 fun OverlaySection(
     granted: Boolean,
     settingsUnavailable: Boolean,
+    moveMode: Boolean,
+    moveModeEnabled: Boolean,
+    onMoveModeChange: (Boolean) -> Unit,
     onGrant: () -> Unit,
     onStart: () -> Unit,
     onStop: () -> Unit,
@@ -45,6 +51,18 @@ fun OverlaySection(
             Button(onClick = onGrant, modifier = Modifier.testTag("overlay-grant")) {
                 Text(stringResource(R.string.overlay_grant))
             }
+        }
+        // One toggleable row: the label is the switch's accessible name and the whole row is the touch target.
+        Row(
+            Modifier.fillMaxWidth().testTag("overlay-move-mode")
+                .toggleable(moveMode, enabled = moveModeEnabled, role = Role.Switch, onValueChange = onMoveModeChange),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.overlay_move_mode))
+                Text(stringResource(R.string.overlay_move_mode_explanation), style = MaterialTheme.typography.bodySmall)
+            }
+            Switch(checked = moveMode, onCheckedChange = null, enabled = moveModeEnabled)
         }
         if (settingsUnavailable) {
             Text(stringResource(R.string.overlay_settings_unavailable), color = MaterialTheme.colorScheme.error)

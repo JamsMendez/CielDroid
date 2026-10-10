@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -48,6 +49,16 @@ class AccessibilityTest {
         listOf(R.string.app_name, R.string.preview_title, R.string.scene_label, R.string.wallpaper_title,
             R.string.overlay_title, R.string.future_modes)
             .forEach { compose.onNode(hasText(string(it)) and heading).assertExists() }
+    }
+
+    // Read-only: the switch is not clicked so the device's persisted move mode stays untouched.
+    @Test fun overlayMoveModeIsOneLabelledSwitch() {
+        launched()
+        val row = compose.onNodeWithTag("overlay-move-mode")
+        row.assert(isToggleable())
+        row.assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+        row.assert(hasText(string(R.string.overlay_move_mode)))
+        row.assert(hasText(string(R.string.overlay_move_mode_explanation)))
     }
 
     @Test fun sceneChipsShareOneSelectableGroup() {

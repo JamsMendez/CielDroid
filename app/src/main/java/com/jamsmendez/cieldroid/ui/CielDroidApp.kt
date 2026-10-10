@@ -88,6 +88,8 @@ fun CielDroidApp() {
             )
             OverlaySection(
                 granted = overlayGranted, settingsUnavailable = overlaySettingsUnavailable,
+                moveMode = settings.overlay.moveMode, moveModeEnabled = enabled,
+                onMoveModeChange = vm::setOverlayMoveMode,
                 onGrant = { overlaySettingsUnavailable = !context.openOverlayPermissionSettings() },
                 onStart = { if (context.canDrawOverlays()) context.startMiniOverlay() else overlayGranted = false },
                 onStop = { context.stopMiniOverlay() },

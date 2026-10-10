@@ -144,6 +144,11 @@ adaptation (`SceneAdaptations`, outside the 56-original `SceneAssets` inventory 
 service (no foreground service) owning one touch-through `TYPE_APPLICATION_OVERLAY` window with a
 transparent WebView generation (wallpaper scene/FPS, MINI), paused on screen off. `MiniTransparencyTest`
 proves alpha off-screen only; the overlay window itself is unverified until the user grants the permission.
+O03a: `OverlayPlacement` sizes the WebView at 0.42 × short side inside a 0.86-cropped window
+(4 dp default top-end margin below the status bar; absolute TOP|START coordinates with no inset fitting).
+Persisted `overlay_move_mode` (default off) and `overlay_x`/`overlay_y`; move mode clears
+FLAG_NOT_TOUCHABLE live and `OverlayFrame` intercepts every touch to drag (clamped, saved on UP/CANCEL),
+so the WebView never gets input. Off = pass-through. Drag/persist/pass-through verified once on device (moto g84).
 
 ## Change boundaries
 

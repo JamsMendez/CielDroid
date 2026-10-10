@@ -2,6 +2,8 @@ package com.jamsmendez.cieldroid.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import com.jamsmendez.cieldroid.domain.OverlayPosition
+import com.jamsmendez.cieldroid.domain.OverlaySettings
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.PreviewSettings
 import com.jamsmendez.cieldroid.domain.SceneId
@@ -17,6 +19,9 @@ class PreferencesSettingsRepository(
     private val fpsKey = intPreferencesKey("preview_fps")
     private val wallpaperSceneKey = stringPreferencesKey("wallpaper_scene")
     private val wallpaperFpsKey = intPreferencesKey("wallpaper_fps")
+    private val overlayMoveModeKey = booleanPreferencesKey("overlay_move_mode")
+    private val overlayXKey = intPreferencesKey("overlay_x")
+    private val overlayYKey = intPreferencesKey("overlay_y")
 
     // Wrong preference types are invalid inputs too, not storage failures.
     private fun decode(
@@ -26,11 +31,22 @@ class PreferencesSettingsRepository(
         PreviewFps.parse(values[fps.name] as? Int) ?: default.fps,
     )
 
+    // A position needs both non-negative coordinates; anything else means the default corner.
+    private fun decodeOverlay(values: Map<String, Any>): OverlaySettings {
+        val x = values[overlayXKey.name] as? Int
+        val y = values[overlayYKey.name] as? Int
+        return OverlaySettings(
+            moveMode = values[overlayMoveModeKey.name] as? Boolean ?: false,
+            position = if (x != null && y != null && x >= 0 && y >= 0) OverlayPosition(x, y) else null,
+        )
+    }
+
     private fun decode(preferences: Preferences): SettingsState {
         val values = preferences.asMap().entries.associate { it.key.name to it.value }
         return SettingsState(
             decode(values, sceneKey, fpsKey, PreviewSettings()),
             decode(values, wallpaperSceneKey, wallpaperFpsKey, PreviewSettings.WALLPAPER_DEFAULT),
+            decodeOverlay(values),
             loaded = true,
         )
     }
@@ -45,4 +61,11 @@ class PreferencesSettingsRepository(
     override suspend fun setFps(fps: PreviewFps) { store.edit { it[fpsKey] = fps.value } }
     override suspend fun setWallpaperScene(scene: SceneId) { store.edit { it[wallpaperSceneKey] = scene.assetId } }
     override suspend fun setWallpaperFps(fps: PreviewFps) { store.edit { it[wallpaperFpsKey] = fps.value } }
+    override suspend fun setOverlayMoveMode(enabled: Boolean) { store.edit { it[overlayMoveModeKey] = enabled } }
+    override suspend fun setOverlayPosition(position: OverlayPosition) {
+        store.edit {
+            it[overlayXKey] = position.x
+            it[overlayYKey] = position.y
+        }
+    }
 }

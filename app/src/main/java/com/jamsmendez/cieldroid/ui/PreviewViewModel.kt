@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.SettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
+import com.jamsmendez.cieldroid.domain.OverlayPosition
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.SceneId
 import kotlinx.coroutines.CancellationException
@@ -29,6 +30,9 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
     fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
     fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
 
+    fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
+    fun saveOverlayPosition(position: OverlayPosition) = write(OVERLAY_ERROR) { repository.setOverlayPosition(position) }
+
     private fun write(errorMessage: String, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
         viewModelScope.launch {
@@ -42,6 +46,7 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
 
     companion object {
         private const val PREVIEW_ERROR = "Could not save preview settings. Try selecting again."
+        private const val OVERLAY_ERROR = "Could not save overlay settings. Try again."
         private const val WALLPAPER_ERROR = "Could not save wallpaper settings. Try selecting again."
 
         fun factory(context: Context): ViewModelProvider.Factory {

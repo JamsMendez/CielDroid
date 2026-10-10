@@ -170,4 +170,68 @@ class PreferencesSettingsRepositoryTest {
         assertEquals(PreviewSettings(), repo.state.value.settings)
         assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
     }
+
+    @Test fun overlayMoveModeAndPositionPersistIndependentlyWithValidatedDefaults() = runTest {
+        val file = testFile()
+        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        try {
+            val repo = PreferencesSettingsRepository(store, scope)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(moveMode = false, position = null), repo.state.value.overlay)
+            repo.setOverlayMoveMode(true)
+            repo.setOverlayPosition(OverlayPosition(120, 340))
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
+            assertEquals(PreviewSettings(), repo.state.value.settings)
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            val stored = store.updateData { it }
+            assertEquals(true, stored[booleanPreferencesKey("overlay_move_mode")])
+            assertEquals(120, stored[intPreferencesKey("overlay_x")])
+            assertEquals(340, stored[intPreferencesKey("overlay_y")])
+            repo.setWallpaperScene(SceneId.RAPHAEL)
+            repo.setScene(SceneId.EXPLORER)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
+            repo.setOverlayMoveMode(false)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(false, OverlayPosition(120, 340)), repo.state.value.overlay)
+            assertEquals(SceneId.RAPHAEL, repo.state.value.wallpaper.scene)
+            // Wrong types, negatives and half-written positions fall back to the defaults.
+            store.edit {
+                it.remove(booleanPreferencesKey("overlay_move_mode"))
+                it[stringPreferencesKey("overlay_move_mode")] = "true"
+                it[intPreferencesKey("overlay_x")] = -5
+            }
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(), repo.state.value.overlay)
+            store.edit {
+                it.remove(intPreferencesKey("overlay_x"))
+                it[stringPreferencesKey("overlay_x")] = "10"
+            }
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(), repo.state.value.overlay)
+            store.edit { it.remove(stringPreferencesKey("overlay_x")) }
+            advanceUntilIdle()
+            assertNull(repo.state.value.overlay.position)
+            assertNull(repo.state.value.error)
+            assertEquals(SceneId.EXPLORER, repo.state.value.settings.scene)
+        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
+    }
+
+    @Test fun overlayWriteFailuresPropagateWithoutOptimisticState() = runTest {
+        val failure = IOException("write denied")
+        val store = object : DataStore<Preferences> {
+            override val data: Flow<Preferences> = flow { emit(emptyPreferences()) }
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences = throw failure
+        }
+        val repo = PreferencesSettingsRepository(store, backgroundScope)
+        runCurrent()
+        try { repo.setOverlayMoveMode(true); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        try { repo.setOverlayPosition(OverlayPosition(1, 2)); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        runCurrent()
+        assertEquals(OverlaySettings(), repo.state.value.overlay)
+    }
 }

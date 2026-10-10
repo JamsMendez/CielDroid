@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
 import android.os.IBinder
@@ -14,9 +15,13 @@ import android.util.Log
 import android.view.Display
 import android.view.Gravity
 import android.view.View
+import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.FrameLayout
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
+import com.jamsmendez.cieldroid.domain.OverlayPlacement
+import com.jamsmendez.cieldroid.domain.OverlayPosition
 import com.jamsmendez.cieldroid.domain.PreviewSettings
 import com.jamsmendez.cieldroid.domain.SceneVariant
 import com.jamsmendez.cieldroid.scenes.PreviewController
@@ -25,15 +30,17 @@ import com.jamsmendez.cieldroid.scenes.WebViewSceneRuntime
 import com.jamsmendez.cieldroid.wallpaper.Teardown
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 private const val TAG = "CielOverlay"
 
 /**
- * Prototype floating MINI scene: one touch-transparent TYPE_APPLICATION_OVERLAY window owning its own
- * controller/WebView generation. Plain started service (no foreground notification); started and
- * stopped explicitly from the launcher. Main-thread owned.
+ * Prototype floating MINI scene: one TYPE_APPLICATION_OVERLAY window owning its own controller/WebView
+ * generation. Touches pass through it unless the persisted move mode is on; then the window frame
+ * intercepts them to drag the window and the WebView never receives input. Plain started service
+ * (no foreground notification); started and stopped explicitly from the launcher. Main-thread owned.
  */
 class MiniOverlayService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -43,8 +50,13 @@ class MiniOverlayService : Service() {
     private var nextGeneration = 1L
     private var generation: Generation? = null
     private var screenReceiver: BroadcastReceiver? = null
+    private var repository: PreferencesSettingsRepository? = null
+    private var moveMode = false
+    /** Current window top-left; null until restored from settings or the default is computed. */
+    private var position: OverlayPosition? = null
 
-    private class Generation(val id: Long, val controller: PreviewController, val teardown: Teardown)
+    private class Window(val manager: WindowManager, val frame: OverlayFrame, val params: WindowManager.LayoutParams)
+    private class Generation(val id: Long, val controller: PreviewController, val teardown: Teardown, val window: Window)
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -83,6 +95,15 @@ class MiniOverlayService : Service() {
     /** The overlay reuses the wallpaper scene/FPS for now, always as MINI. */
     private fun observeSettings() {
         val repository = PreferencesSettingsRepository(applicationContext.settingsPreferences, scope)
+        this.repository = repository
+        // Move mode applies live to the current window; the WebView generation is never recreated for it.
+        scope.launch {
+            repository.state.filter { it.loaded }.map { it.overlay.moveMode }.distinctUntilChanged().collect { enabled ->
+                moveMode = enabled
+                generation?.window?.let { applyFlags(it) }
+                Log.i(TAG, "move mode=$enabled gen=${generation?.id}")
+            }
+        }
         scope.launch {
             repository.state
                 .mapNotNull { state ->
@@ -140,26 +161,107 @@ class MiniOverlayService : Service() {
                     }
             }
             val bounds = windowManager.currentWindowMetrics.bounds
-            // 0.45 of the short side: 25% smaller than the first prototype after on-device review.
-            val side = (minOf(bounds.width(), bounds.height()) * 0.45f).toInt()
-            val margin = (16 * resources.displayMetrics.density).toInt()
+            val size = OverlayPlacement.size(minOf(bounds.width(), bounds.height()))
+            // The scene keeps its full side; the smaller window crops its transparent border around the ring.
+            val frame = OverlayFrame(windowContext)
+            frame.addView(created.view, FrameLayout.LayoutParams(size.webSide, size.webSide, Gravity.CENTER))
+            val start = OverlayPlacement.clamp(
+                position ?: repository?.state?.value?.overlay?.position ?: defaultPosition(windowManager, size.windowSide),
+                size.windowSide, bounds.width(), bounds.height(),
+            )
+            position = start
             val params = WindowManager.LayoutParams(
-                side, side, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT,
+                size.windowSide, size.windowSide, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                windowFlags(moveMode), PixelFormat.TRANSLUCENT,
             ).apply {
-                gravity = Gravity.TOP or Gravity.END
-                x = margin
-                y = margin
+                gravity = Gravity.TOP or Gravity.START
+                // Absolute display coordinates, matching the clamp: no inset fitting, no cutout avoidance.
+                fitInsetsTypes = 0
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                x = start.x
+                y = start.y
                 title = "CielDroid mini overlay"
             }
-            windowManager.addView(created.view, params)
-            teardown.add("window", created.view) { windowManager.removeViewImmediate(it) }
+            val window = Window(windowManager, frame, params)
+            attachDrag(window)
+            windowManager.addView(frame, params)
+            teardown.add("window", frame) { windowManager.removeViewImmediate(it) }
             created.load()
-            Log.i(TAG, "gen=$id created side=$side $settings")
-            Generation(id, controller, teardown)
+            Log.i(TAG, "gen=$id created web=${size.webSide} window=${size.windowSide} at $start move=$moveMode $settings")
+            Generation(id, controller, teardown, window)
         }
+
+    /** Top-end corner below the status bar, as the former inset-fitted TOP|END window was. */
+    private fun defaultPosition(windowManager: WindowManager, windowSide: Int): OverlayPosition {
+        val metrics = windowManager.currentWindowMetrics
+        return OverlayPlacement.defaultPosition(
+            metrics.bounds.width(), windowSide, (OverlayPlacement.EDGE_MARGIN_DP * resources.displayMetrics.density).toInt(),
+            topInset = metrics.windowInsets.getInsets(WindowInsets.Type.statusBars()).top,
+        )
+    }
+
+    /** Move mode clears FLAG_NOT_TOUCHABLE; the window is never focusable. */
+    private fun windowFlags(move: Boolean): Int {
+        val base = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        return if (move) base else base or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+    }
+
+    private fun applyFlags(window: Window) {
+        val flags = windowFlags(moveMode)
+        if (window.params.flags == flags) return
+        window.params.flags = flags
+        updateLayout(window)
+    }
+
+    private fun updateLayout(window: Window) {
+        if (window.frame.isAttachedToWindow) window.manager.updateViewLayout(window.frame, window.params)
+    }
+
+    /** Drags move the window clamped to the screen; the position is persisted once, when the gesture ends. */
+    private fun attachDrag(window: Window) {
+        var startX = 0
+        var startY = 0
+        window.frame.onDragStart = {
+            startX = window.params.x
+            startY = window.params.y
+        }
+        window.frame.onDrag = { dx, dy ->
+            val bounds = window.manager.currentWindowMetrics.bounds
+            val next = OverlayPlacement.clamp(
+                OverlayPosition(startX + dx, startY + dy), window.params.width, bounds.width(), bounds.height(),
+            )
+            window.params.x = next.x
+            window.params.y = next.y
+            position = next
+            updateLayout(window)
+        }
+        window.frame.onDragEnd = { persistPosition(OverlayPosition(window.params.x, window.params.y)) }
+    }
+
+    private fun persistPosition(next: OverlayPosition) {
+        val repository = repository ?: return
+        scope.launch {
+            try {
+                repository.setOverlayPosition(next)
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (e: Exception) { Log.w(TAG, "could not persist overlay position $next", e) }
+        }
+    }
+
+    /** Rotation or a display change: keep the whole window on the new screen. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val window = generation?.window ?: return
+        val bounds = window.manager.currentWindowMetrics.bounds
+        val current = OverlayPosition(window.params.x, window.params.y)
+        val clamped = OverlayPlacement.clamp(current, window.params.width, bounds.width(), bounds.height())
+        if (clamped == current) return
+        window.params.x = clamped.x
+        window.params.y = clamped.y
+        position = clamped
+        updateLayout(window)
+        Log.i(TAG, "re-clamped overlay to $clamped for ${bounds.width()}x${bounds.height()}")
+    }
 
     /** Idempotent: the field is cleared before release. */
     private fun releaseGeneration(reason: String) {

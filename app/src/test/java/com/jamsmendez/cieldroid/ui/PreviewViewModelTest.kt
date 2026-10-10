@@ -34,6 +34,16 @@ class PreviewViewModelTest {
             if (fail) error("disk unavailable")
             state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(fps = fps))
         }
+        override suspend fun setOverlayMoveMode(enabled: Boolean) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(moveMode = enabled))
+        }
+        override suspend fun setOverlayPosition(position: OverlayPosition) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(position = position))
+        }
     }
     @Test fun notLoadedCannotWriteAndFailedWriteIsNotAcknowledged() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
@@ -85,6 +95,36 @@ class PreviewViewModelTest {
             vm.selectWallpaperFps(PreviewFps.THIRTY)
             runCurrent()
             assertEquals(3, repo.writes) // a read error blocks wallpaper writes too
+        } finally { Dispatchers.resetMain() }
+    }
+
+    @Test fun overlayMoveModeToggleIsGatedAndFailuresAreReported() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val repo = Repository()
+            val vm = PreviewViewModel(repo)
+            vm.setOverlayMoveMode(true)
+            runCurrent()
+            assertEquals(0, repo.writes)
+            repo.state.value = SettingsState(loaded = true)
+            vm.setOverlayMoveMode(true)
+            runCurrent()
+            assertTrue(vm.settings.value.overlay.moveMode)
+            vm.saveOverlayPosition(OverlayPosition(10, 20))
+            runCurrent()
+            assertEquals(OverlayPosition(10, 20), vm.settings.value.overlay.position)
+            assertEquals(PreviewSettings(), vm.settings.value.settings)
+            repo.fail = true
+            vm.setOverlayMoveMode(false)
+            runCurrent()
+            assertTrue(vm.settings.value.overlay.moveMode)
+            assertNotNull(vm.writeError.value)
+            repo.fail = false
+            vm.setOverlayMoveMode(false)
+            runCurrent()
+            assertFalse(vm.settings.value.overlay.moveMode)
+            assertNull(vm.writeError.value)
+            assertEquals(4, repo.writes) // the gated first call never wrote
         } finally { Dispatchers.resetMain() }
     }
 }
