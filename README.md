@@ -138,8 +138,8 @@ deferred: scene element scale/sizing on the phone, consistent with the upstream 
 desktop-sized layout (viewport `width=device-width,initial-scale=1`, no adapter zoom
 overrides); original bytes are preserved. Readiness markers and human observation are not
 automated visual/pixel, cadence or accessibility proof; accessibility, cadence measurement,
-security audit, licensing, remote CI and publishing remain pending. C15 native review and
-local commit are pending.
+security audit, licensing, remote CI and publishing remain pending. C15 closed at
+`c36b0dc` (native approved).
 
 ## Build and verification
 

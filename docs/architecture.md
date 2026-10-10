@@ -85,5 +85,5 @@ See the [test plan](test-plan.md) for the acceptance matrix and evidence history
 and [renderer decision](renderer-decision.md) for future prototype alternatives.
 Phase 0/1 code is complete; C15 recorded one-device instrumentation and manual checks, but visual fidelity, cadence and accessibility acceptance remain pending. Phase 2 overlay,
 phase 3 wallpaper and phase 4 widget implementation and independent owner
-configuration are deferred; no wallpaper renderer has been selected or proven viable. Publishing rights, remote CI and real device behavior remain
+configuration are deferred; no wallpaper renderer has been selected or proven viable. Publishing rights, remote CI and behavior beyond the single C15 API 35 device remain
 unverified. C14 added no staging, publishing or SDK installs and closed at `42dc3b1`.

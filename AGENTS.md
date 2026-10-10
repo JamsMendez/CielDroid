@@ -93,7 +93,7 @@ rates readiness). No app crash/CSP/Uncaught/WebGL logcat errors; human manual ch
 Known deferred issue: element scale/sizing on phone (upstream desktop-sized layout,
 `width=device-width,initial-scale=1`, no adapter zoom); original bytes preserved. Not
 automated visual/pixel, cadence or accessibility proof; accessibility, cadence, security
-audit, licensing, remote CI and publishing remain pending. C15 native review/local commit pending.
+audit, licensing, remote CI and publishing remain pending. C15 closed at `c36b0dc` (native approved).
 
 ## Change boundaries
 
