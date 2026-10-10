@@ -15,8 +15,15 @@ C07 adds the whole processing Full/Mini component: 12 unchanged text files /
 153772 bytes / 3402 lines. Full is default; query or hash `variant=mini` selects
 Mini in the same files; query `fps=30` selects 30 fps, otherwise 60.
 Preserve CielWin headers and processing's original qrc-only CSP (`index.html:5`).
-The C07 candidate is 38 originals / 687578 bytes (37 text, one TTF), not the intended
-56-file / 940651-byte catalog; 18 raphael files / 253073 bytes remain out.
+C07 imported 38 originals / 687578 bytes (37 text, one TTF).
+C08a prepares ten whole original Raphael JS files (listed in README):
+122670 bytes / 1940 newline-counted vendor lines; expected cumulative scope is
+48 originals / 810248 bytes (47 text, one TTF), not the intended 56-file catalog.
+This is the scene, not the external Raphaël library. No Raphael HTML/drivers or
+complete runnable scene are included; config uses DOM and model helpers may draw.
+C08b's eight rendering/entry files / 130403 bytes remain outside the candidate.
+Only C08b completes all 56 originals / 940651 bytes, not runtime integration.
+Preserve original bytes, CielWin headers, ordering and seeded RNG.
 Processing's static ten-JS/CSS/shared-overlay/font closure is not execution,
 GPU proof or Android compatibility; runtime integration awaits C13.
 The launcher stays catalog-only. Retain the qrc-only CSP at `idle/index.html:5`;
@@ -59,7 +66,7 @@ Do not claim globally immutable Git metadata history.
 Historical C06b: four checks passed: eight fresh tests (seven functional), no failures,
 errors or skips; lint 0 errors/34 warnings. Separate checks match all 26 originals
 against committed upstream, catalog and APK; source/index unchanged.
-C07: four separate offline wrapper checks exited 0; task counts and attested
+Historical C07: four separate offline wrapper checks exited 0; task counts and attested
 production/test manifest boundaries are recorded in README. Eight fresh host tests
 (seven functional) had no failures/errors/skips; lint 0 errors/24 warnings
 (23 UnusedResources, one ObsoleteSdkInt), distinct from historical counts above.
@@ -71,12 +78,30 @@ and NO-SOURCE tasks are not JUnit skips. Strict final metadata audit exited 1 so
 for common `.git` root directory mtime-only drift; writer unknown, transient lock
 only a possible mechanism. All 88 source/index entries, HEAD, 14-path staged status,
 pure tree, metadata-file bytes/size/mtime/mode and linked metadata were unchanged.
-Human accepted qualified I02 continuation; passes stand, native review/commit pending.
+Human accepted qualified I02 continuation; passes stand. Native review/local commit
+closed at e51ad24. Final C07 audit observed zero current metadata drift, not globally
+immutable history; the failed I02 strict audit and unknown writer remain qualified.
+C08a's four separate offline wrapper checks exited 0; task counts and binary manifest
+boundaries are recorded in README. Eight fresh host tests (seven functional, one
+arithmetic) had no failures/errors/skips; lint 0 errors/24 warnings (23 UnusedResources,
+one ObsoleteSdkInt). Separate catalog/committed-upstream/production-APK byte checks
+match all 48 originals / 810248 bytes; test APK assets: zero, not host asset coverage.
+Eight future Raphael rendering/entry files / 130403 bytes were absent only isolated.
+Four actual JDK 25 daemon requests were attested, distinct from the JDK 26 launcher.
+AndroidX signature permission/startup provider/DUMP-protected receiver mean production
+is not permission-free; test AndroidJUnitRunner/REORDER_TASKS remain separate.
+Strict current audit exited 0: all 98 source/index entries, HEAD, staged status and pure
+tree unchanged; common/linked metadata files and directories had zero current drift.
+Only ignored build/cache outputs changed; pre-existing `.atl` was unchanged. This does
+not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writer or
+I02's failed historical directory-mtime gate and human-qualified continuation.
+Functional checks, provenance and attestation passed; native review/local commit pending.
 Whole-component import is not Full visual/GPU proof; no runtime controls are added.
 The full asset verifier requires all 56 files and first applies at C09.
 Final UI documentation restoration remains C13/C14 work, not this slice.
 The arithmetic example is not functional.
 Build output and test APK assembly do not prove device behavior. Report failures
-and skipped checks explicitly. Device launch, accessibility and lifecycle remain pending.
+and skipped checks explicitly. Device, visual/GPU/WebGL, cadence, accessibility
+and lifecycle acceptance remain pending.
 Public toolchain stability, upstream distribution licensing and remote CI are
 unverified; do not publish on the strength of a local build.

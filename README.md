@@ -10,7 +10,7 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file / 940651-byte set, not the C07 subset.
+catalogs the intended complete 56-file / 940651-byte set, not the C08a subset.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
 these files; Full is the default and `?variant=mini` selects Mini. The canvas
@@ -29,8 +29,17 @@ Full is default; query or hash `variant=mini` selects Mini in the same files;
 query `fps=30` selects 30 fps, otherwise 60. The “Processing mini” canvas label
 is not a Mini-only import. Static closure covers ten JS files, CSS and the shared
 overlay/font; it is not execution, GPU proof or Android compatibility.
-The C07 candidate is 38 originals / 687578 bytes (37 text, one TTF);
-18 raphael files / 253073 bytes remain out. Android runtime integration awaits C13.
+C07 imported 38 originals / 687578 bytes (37 text, one TTF).
+C08a prepares ten whole original JS files under `app/src/main/assets/scenes/raphael/`:
+`js/{config,math,hexadecagon,sphere,scene-data,feathers,glyphs,glyph-rings,digits,central-core}.js`
+(122670 bytes / 1940 newline-counted vendor lines). Expected cumulative scope:
+48 originals / 810248 bytes (47 text, one TTF). This is the Raphael scene,
+not the external Raphaël library. C08a has no HTML or drivers and is not a complete,
+self-contained runnable scene; config uses DOM and model helpers may draw.
+C08b's eight rendering/entry files remain outside this candidate: `index.html`,
+`styles.css`, `js/{nebula,sprites,layers,see-through-hook,render-loop,main}.js`
+(130403 bytes). Only C08b completes the 56-file inventory, not Android integration.
+Preserve original bytes, CielWin headers, ordering and seeded RNG; runtime awaits C13.
 The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
@@ -64,7 +73,8 @@ tests and assets are preserved, but are not evidence for C03. Test APK compilati
 is not execution. With an authorized API 35+ device, run
 `./gradlew :app:connectedDebugAndroidTest` and check launch, light/dark themes,
 large fonts, insets, scrolling, rotation and lifecycle. No device/AVD acceptance
-has been established; GPU, accessibility and lifecycle acceptance remain pending.
+has been established; visual/GPU/WebGL, cadence, accessibility and lifecycle
+acceptance remain pending.
 
 Historical C04 only: isolated provenance, packaging and four checks passed: eight fresh
 host tests (seven functional), no failures/errors/skips; lint 0 errors/34 warnings.
@@ -86,7 +96,7 @@ the writer is unknown. This is not a globally immutable metadata history.
 Historical C06b: four isolated checks passed: eight fresh host tests (seven functional),
 no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
 26 originals against committed upstream, catalog and APK; source/index unchanged.
-C07: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
+Historical C07: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
 forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
 Eight fresh host tests (seven functional) had no failures/errors/skips;
 lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
@@ -103,7 +113,30 @@ only the common `.git` root directory had mtime-only drift; writer unknown.
 All 88 candidate source/index entries, HEAD, 14-path staged status and pure tree
 were unchanged, as were metadata-file bytes/size/mtime/mode and linked metadata.
 A transient lock is only a possible mechanism, not proven causality. Human accepted
-qualified I02 continuation; passing checks stand, native review/local commit pending.
+qualified I02 continuation; passing checks stand. Native review and local commit
+closed at `e51ad24`. The final C07 audit observed zero current metadata drift;
+it does not erase the failed I02 strict audit or establish globally immutable history.
+C08a: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
+forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
+Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
+lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Separate catalog, committed-upstream and production-APK byte checks match all
+48 originals / 810248 bytes, including ten whole Raphael JS files / 122670 bytes /
+1940 newlines; test APK assets: zero. The eight future Raphael rendering/entry files /
+130403 bytes were absent in the isolated candidate only. Host tests are not asset coverage.
+Binary manifests attest production min35/target37, sole MainActivity launcher and no
+services or Internet/overlay/wallpaper permissions; AndroidX app-local signature
+permission, startup provider and DUMP-protected receiver mean it is not permission-free.
+The separate test manifest uses AndroidJUnitRunner and REORDER_TASKS. Four actual
+JDK 25 daemon requests were attested, distinct from the JDK 26 launcher. Test APK
+compilation is not device/instrumentation execution; preDebugAndroidTestBuild SKIPPED
+and NO-SOURCE tasks are not JUnit skips. The strict current audit exited 0: all 98
+source/index entries, HEAD, staged status and pure tree were unchanged, with zero
+current drift in common/linked metadata files and directories. Outputs were confined
+to ignored build/cache roots; pre-existing `.atl` was unchanged. This current pass does
+not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writer or
+I02's failed historical directory-mtime gate and human-qualified continuation.
+Functional checks, provenance and attestation passed; native review/local commit pending.
 Component import alone proves neither Full visual behavior nor GPU compatibility.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
 Final UI documentation restoration belongs to C13/C14, not this slice.
