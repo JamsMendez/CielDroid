@@ -5,7 +5,8 @@ C02's Compose launcher and scene-name catalog. User-facing settings controls,
 preview rendering, overlay, wallpaper and widget integration remain out of scope.
 C04 added three original shared resources; C05 adds the whole unchanged idle
 Full/Mini component (11 text files, 175960 bytes), not a Mini-only scene.
-Full is default; `?variant=mini` selects Mini in the same files.
+Full is default; query or hash `variant=mini` selects Mini in the same files;
+query `fps=30` selects 30 fps, otherwise 60.
 C06b completes Explorer: 12 unchanged text files / 209240 bytes / 3665 lines.
 Six entry/style/driver files (57160 bytes / 1074 lines), listed in README, join
 C06a's six model/effects JS files. Full/Mini share files; Full is default, query
@@ -17,12 +18,15 @@ Mini in the same files; query `fps=30` selects 30 fps, otherwise 60.
 Preserve CielWin headers and processing's original qrc-only CSP (`index.html:5`).
 C07 imported 38 originals / 687578 bytes (37 text, one TTF).
 C08a prepares ten whole original Raphael JS files (listed in README):
-122670 bytes / 1940 newline-counted vendor lines; expected cumulative scope is
-48 originals / 810248 bytes (47 text, one TTF), not the intended 56-file catalog.
-This is the scene, not the external Raphaël library. No Raphael HTML/drivers or
-complete runnable scene are included; config uses DOM and model helpers may draw.
-C08b's eight rendering/entry files / 130403 bytes remain outside the candidate.
-Only C08b completes all 56 originals / 940651 bytes, not runtime integration.
+122670 bytes / 1940 newline-counted vendor lines. C08b adds eight whole originals
+(listed in README), 130403 bytes / 2732 lines, completing Raphael's 18 text files /
+253073 bytes / 4672 lines. Cumulative candidate: 56 originals / 940651 bytes
+(55 text, one TTF), complete asset inventory, not a complete app/runtime integration.
+C08b byte checks match the unchanged catalog, committed upstream and production APK.
+This is the scene, not the external Raphaël library. Full/Mini share files; Full is
+default; query or hash `variant=mini` selects Mini; query `fps=30` selects 30 fps,
+otherwise 60. Preserve Raphael's original qrc-only CSP (`index.html:5`).
+Its static 16-JS/CSS/shared-overlay/font closure is not execution or Android/GPU proof.
 Preserve original bytes, CielWin headers, ordering and seeded RNG.
 Processing's static ten-JS/CSS/shared-overlay/font closure is not execution,
 GPU proof or Android compatibility; runtime integration awaits C13.
@@ -81,7 +85,7 @@ pure tree, metadata-file bytes/size/mtime/mode and linked metadata were unchange
 Human accepted qualified I02 continuation; passes stand. Native review/local commit
 closed at e51ad24. Final C07 audit observed zero current metadata drift, not globally
 immutable history; the failed I02 strict audit and unknown writer remain qualified.
-C08a's four separate offline wrapper checks exited 0; task counts and binary manifest
+Historical C08a: four separate offline wrapper checks exited 0; task counts and binary manifest
 boundaries are recorded in README. Eight fresh host tests (seven functional, one
 arithmetic) had no failures/errors/skips; lint 0 errors/24 warnings (23 UnusedResources,
 one ObsoleteSdkInt). Separate catalog/committed-upstream/production-APK byte checks
@@ -95,7 +99,29 @@ tree unchanged; common/linked metadata files and directories had zero current dr
 Only ignored build/cache outputs changed; pre-existing `.atl` was unchanged. This does
 not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writer or
 I02's failed historical directory-mtime gate and human-qualified continuation.
-Functional checks, provenance and attestation passed; native review/local commit pending.
+C08a functional checks, provenance and attestation passed; native review/local commit
+closed at 6e1f6f0, not C08b approval.
+C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
+forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
+Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
+lint 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Separate catalog/committed-upstream/production-APK byte checks match exactly all
+56 originals / 940651 bytes (55 text, one TTF), no extras; test APK assets: zero.
+Host tests are not asset coverage. Binary manifests attest `com.jamsmendez.cieldroid`,
+min35/target37, sole MainActivity launcher, no services or Internet/overlay/wallpaper
+permissions. AndroidX signature permission/startup provider/DUMP-protected receiver
+mean production is not permission-free; test package/target, AndroidJUnitRunner and
+REORDER_TASKS remain separate. Four actual JDK 25 daemon requests were attested,
+distinct from the JDK 26 launcher. Test APK compilation is not device execution;
+preDebugAndroidTestBuild was SKIPPED in lint/test-APK checks; NO-SOURCE is not a JUnit skip.
+Strict current audit exited 0: all 106 source/index entries, HEAD, staged status and
+pure tree unchanged; 674 common and nine linked metadata files/directories, including
+roots and Git pointer, had zero current drift. Only authorized ignored build/cache
+outputs changed; pre-existing `.atl` was unchanged. Working-root/app-directory mtime/size
+changes from cache creation are not source/Git metadata drift or filesystem-wide
+immutability. Historical C05/C06a/I02 qualifications above remain valid.
+C08b functional checks, provenance and attestation passed; final identity verification,
+native closure and local commit remain pending, not C08b approval.
 Whole-component import is not Full visual/GPU proof; no runtime controls are added.
 The full asset verifier requires all 56 files and first applies at C09.
 Final UI documentation restoration remains C13/C14 work, not this slice.

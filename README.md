@@ -10,10 +10,12 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file / 940651-byte set, not the C08a subset.
+catalogs all 56 originals / 940651 bytes; it is unchanged for C08b.
+C08b byte checks match this inventory, committed upstream and production APK.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
-these files; Full is the default and `?variant=mini` selects Mini. The canvas
+these files; Full is default; query or hash `variant=mini` selects Mini;
+query `fps=30` selects 30 fps, otherwise 60. The canvas
 “Idle mini” label does not make this a Mini-only component.
 C06b completes the whole unchanged Explorer component under
 `app/src/main/assets/scenes/explorer/`: 12 text files / 209240 bytes / 3665 lines.
@@ -32,21 +34,24 @@ overlay/font; it is not execution, GPU proof or Android compatibility.
 C07 imported 38 originals / 687578 bytes (37 text, one TTF).
 C08a prepares ten whole original JS files under `app/src/main/assets/scenes/raphael/`:
 `js/{config,math,hexadecagon,sphere,scene-data,feathers,glyphs,glyph-rings,digits,central-core}.js`
-(122670 bytes / 1940 newline-counted vendor lines). Expected cumulative scope:
-48 originals / 810248 bytes (47 text, one TTF). This is the Raphael scene,
-not the external Raphaël library. C08a has no HTML or drivers and is not a complete,
-self-contained runnable scene; config uses DOM and model helpers may draw.
-C08b's eight rendering/entry files remain outside this candidate: `index.html`,
-`styles.css`, `js/{nebula,sprites,layers,see-through-hook,render-loop,main}.js`
-(130403 bytes). Only C08b completes the 56-file inventory, not Android integration.
+(122670 bytes / 1940 newline-counted vendor lines).
+C08b adds eight whole original rendering/entry files: `index.html`, `styles.css`,
+`js/{nebula,sprites,layers,see-through-hook,render-loop,main}.js`
+(130403 bytes / 2732 vendor lines), completing Raphael's 18 text files /
+253073 bytes / 4672 lines. The cumulative candidate has all 56 originals /
+940651 bytes (55 text, one TTF): complete asset inventory, not a complete app.
+This is the Raphael scene, not the external Raphaël library. Full/Mini share files;
+Full is default; query or hash `variant=mini` selects Mini; query `fps=30`
+selects 30 fps, otherwise 60. Static closure covers 16 JS files, CSS and shared
+overlay/font; it is not execution, Android compatibility or GPU/visual proof.
 Preserve original bytes, CielWin headers, ordering and seeded RNG; runtime awaits C13.
 The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
 these natural components, not native-code budgets or public JavaScript licensing.
 Original qrc-only CSPs remain at `idle/index.html:5`, `explorer/index.html:5`
-and `processing/index.html:5`; import does not establish Android rendering
-compatibility. Idle's static references cover all nine JS files, CSS, shared alert
+and `processing/index.html:5`, plus `raphael/index.html:5`; import does not establish
+Android rendering compatibility. Idle's static references cover all nine JS files, CSS, shared alert
 overlay and Archivo Black/OFL; this bounded dependency
 closure is not dynamic runtime proof.
 
@@ -116,7 +121,7 @@ A transient lock is only a possible mechanism, not proven causality. Human accep
 qualified I02 continuation; passing checks stand. Native review and local commit
 closed at `e51ad24`. The final C07 audit observed zero current metadata drift;
 it does not erase the failed I02 strict audit or establish globally immutable history.
-C08a: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
+Historical C08a: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
 forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
 Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
 lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
@@ -136,7 +141,29 @@ current drift in common/linked metadata files and directories. Outputs were conf
 to ignored build/cache roots; pre-existing `.atl` was unchanged. This current pass does
 not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writer or
 I02's failed historical directory-mtime gate and human-qualified continuation.
-Functional checks, provenance and attestation passed; native review/local commit pending.
+C08a functional checks, provenance and attestation passed; native review/local commit
+closed at `6e1f6f0`. This does not approve C08b.
+C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
+forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
+Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
+lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Separate catalog, committed-upstream and production-APK byte checks match exactly
+56 originals / 940651 bytes (55 text, one TTF), with no extra assets; test APK assets: zero.
+Host tests are not asset coverage. Binary manifests attest `com.jamsmendez.cieldroid`,
+min35/target37, sole MainActivity launcher, no services or Internet/overlay/wallpaper
+permissions; AndroidX signature permission, startup provider and DUMP-protected receiver
+mean production is not permission-free. Test package/target, AndroidJUnitRunner and
+REORDER_TASKS are separate. Four actual JDK 25 daemon requests were attested,
+distinct from the JDK 26 launcher. Test APK compilation is not device execution;
+preDebugAndroidTestBuild was SKIPPED in lint/test-APK checks; NO-SOURCE tasks are not
+JUnit skips. Strict current audit exited 0: all 106 source/index entries, HEAD, staged
+status and pure tree unchanged; 674 common and nine linked metadata files/directories,
+including roots and Git pointer, had zero current drift. Only authorized ignored
+build/cache outputs changed; pre-existing `.atl` was unchanged. Working-root/app-directory
+mtime/size changes from cache creation are not source/Git metadata drift, nor proof of
+filesystem-wide immutability. Historical C05/C06a/I02 qualifications above still apply.
+C08b functional checks, provenance and attestation passed; final identity verification,
+native closure and local commit remain pending. This is not C08b approval.
 Component import alone proves neither Full visual behavior nor GPU compatibility.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
 Final UI documentation restoration belongs to C13/C14, not this slice.
