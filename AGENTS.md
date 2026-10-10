@@ -111,6 +111,31 @@ RED 4/4 assertion failures, GREEN 4/4; full `am instrument` OK (9 tests) on the 
 app FATAL/Uncaught/CSP logcat. Gaps: no ATF scanner (dependency), no manual TalkBack pass, no
 translations, no reduced-motion handling; single device.
 
+W01 spike (unmeasured, not adopted): `wallpaper/SceneWallpaperService` engine surface → private
+`VirtualDisplay` (`OWN_CONTENT_ONLY`, no permission) → `Presentation(service, display)` hosting one
+`WebViewSceneRuntime` + `PreviewController` per generation; fixed idle/30 fps, no settings UI. The
+`BIND_WALLPAPER` service plus `res/xml/scene_wallpaper.xml` is the only manifest addition. System
+preview on the API 35 phone (not applied): scene pixels visible, READY (both markers), visibility
+pause, surface/engine destroy released the display; no FATAL/CSP/Uncaught/WebGL logcat. The
+preview stayed portrait, so surface resize/landscape is unexercised. `DisplayPlanTest` RED→GREEN;
+engine lifecycle is device-only. Cost/cadence/applied engine are W02/W03; single device.
+
+W04a: generation build uses a `Teardown` release stack (reverse-order release on partial failure,
+no generation left); surface changes resize the VirtualDisplay in place (`DisplayPlan.SwapSurface`
+for a new Surface object), keeping the Presentation/WebView. Independent `wallpaper_scene` /
+`wallpaper_fps` keys (default idle/30) share the `preview` DataStore; the repository and ViewModel
+expose them, with no UI yet (W04b). The engine follows them and rebuilds its generation on change.
+FPS/energy/landscape remain unmeasured (deferred by user); single device.
+
+W04b: stateless `ui/WallpaperSection` (heading, scene chips in a `selectableGroup`, FPS chips, tags
+`wallpaper-scene-<id>` / `wallpaper-fps-<n>` / `wallpaper-set`) writes the wallpaper keys only.
+Chip text semantics are cleared and replaced by "Wallpaper scene <id>" / "Wallpaper <n> FPS"
+content descriptions, so text-based preview tests stay unambiguous. "Set as wallpaper" opens
+`ACTION_CHANGE_LIVE_WALLPAPER`; the user applies it in the system UI, never the app or tests;
+`ActivityNotFoundException` shows inline text. The engine now detects a recreated surface via
+`onSurfaceCreated` (the holder reuses one `Surface` object, so identity never changed). Limits:
+fps 12.6/30 measured once for idle; energy, landscape, processing/60 unmeasured; single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

@@ -162,6 +162,34 @@ semantics set there never reached TalkBack. The decorative WebView is
 OK (9 tests) on the API 35 phone, no app FATAL/Uncaught/CSP logcat. Gaps: no automated ATF
 scan (needs a dependency), no manual TalkBack pass, no translations, no reduced-motion handling.
 
+W01 adds an unmeasured live-wallpaper spike, not an adopted renderer. `SceneWallpaperService`
+renders its engine surface through a private `VirtualDisplay` (`VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY`,
+no permission) and a `Presentation` built from the service context, hosting one
+`WebViewSceneRuntime` + `PreviewController` per generation (fixed idle at 30 fps, no configuration
+UI). The `BIND_WALLPAPER` service and its `scene_wallpaper.xml` metadata are the only manifest
+addition. In the system live-wallpaper preview on the API 35 phone (never applied), the scene
+pixels were visible, readiness reached READY, visibility paused it, and closing the preview
+destroyed the surface and engine and released the display, with no FATAL/CSP/Uncaught/WebGL
+logcat. The preview activity stayed portrait, so resize/landscape is not yet exercised. Nothing
+is measured (W02/W03 pending); single device only.
+
+W04a hardens the engine and gives the wallpaper its own settings. Each generation is built under a
+`Teardown` release stack, so a failure part-way through releases what already exists in reverse
+order and leaves no generation. A surface size change resizes the existing `VirtualDisplay` and swaps
+its surface only when the Surface object changed (`DisplayPlan.SwapSurface`); the Presentation and
+WebView stay alive. `wallpaper_scene` / `wallpaper_fps` (default idle at 30 fps) are stored apart
+from `preview_scene` / `preview_fps` in the same DataStore, exposed through the repository and
+ViewModel without UI. The engine follows them and rebuilds its generation on change. FPS, energy and
+landscape are still unmeasured (deferred by the user); single device; no wallpaper UI yet (W04b).
+
+W04b adds a "Live wallpaper" section below the preview: its own scene and FPS chips (independent of
+the preview chips) and a "Set as wallpaper" button. The button opens the system live wallpaper
+preview (`ACTION_CHANGE_LIVE_WALLPAPER` for `SceneWallpaperService`); you confirm it there, and
+CielDroid never applies a wallpaper itself. If no picker exists, an inline message is shown. A
+recreated wallpaper surface is now detected from `onSurfaceCreated`, because the holder keeps one
+`Surface` object. Honest limits: one measurement of the idle scene showed about 12.6 of 30 fps;
+energy, landscape and processing at 60 fps are unmeasured; single device (moto g84).
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

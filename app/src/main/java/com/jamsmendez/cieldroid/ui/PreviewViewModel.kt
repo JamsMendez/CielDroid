@@ -1,12 +1,12 @@
 package com.jamsmendez.cieldroid.ui
 
 import android.content.Context
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.SettingsRepository
+import com.jamsmendez.cieldroid.data.settingsPreferences
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.SceneId
 import kotlinx.coroutines.CancellationException
@@ -14,9 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-// Application-owned singleton per preferences file; observation is ViewModel-owned.
-private val Context.previewPreferences by preferencesDataStore(name = "preview")
 
 class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository) : ViewModel() {
     constructor(repository: SettingsRepository) : this({ repository })
@@ -27,28 +24,33 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
     private var generation = 0L
     fun nextGeneration(): Long = ++generation
 
-    fun selectScene(scene: SceneId) = write { repository.setScene(scene) }
-    fun selectFps(fps: PreviewFps) = write { repository.setFps(fps) }
+    fun selectScene(scene: SceneId) = write(PREVIEW_ERROR) { repository.setScene(scene) }
+    fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
+    fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
+    fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
 
-    private fun write(update: suspend () -> Unit) {
+    private fun write(errorMessage: String, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
         viewModelScope.launch {
             try {
                 update()
                 mutableWriteError.value = null
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { mutableWriteError.value = "Could not save preview settings. Try selecting again." }
+            catch (_: Exception) { mutableWriteError.value = errorMessage }
         }
     }
 
     companion object {
+        private const val PREVIEW_ERROR = "Could not save preview settings. Try selecting again."
+        private const val WALLPAPER_ERROR = "Could not save wallpaper settings. Try selecting again."
+
         fun factory(context: Context): ViewModelProvider.Factory {
             val app = context.applicationContext
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     require(modelClass == PreviewViewModel::class.java)
-                    return PreviewViewModel { scope -> PreferencesSettingsRepository(app.previewPreferences, scope) } as T
+                    return PreviewViewModel { scope -> PreferencesSettingsRepository(app.settingsPreferences, scope) } as T
                 }
             }
         }

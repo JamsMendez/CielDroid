@@ -24,6 +24,16 @@ class PreviewViewModelTest {
             if (fail) error("disk unavailable")
             state.value = state.value.copy(settings = state.value.settings.copy(fps = fps))
         }
+        override suspend fun setWallpaperScene(scene: SceneId) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(scene = scene))
+        }
+        override suspend fun setWallpaperFps(fps: PreviewFps) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(fps = fps))
+        }
     }
     @Test fun notLoadedCannotWriteAndFailedWriteIsNotAcknowledged() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
@@ -47,6 +57,34 @@ class PreviewViewModelTest {
             runCurrent()
             assertEquals(PreviewFps.SIXTY, vm.settings.value.settings.fps)
             assertNull(vm.writeError.value)
+        } finally { Dispatchers.resetMain() }
+    }
+
+    @Test fun wallpaperSelectionIsGatedAndIndependentOfPreview() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val repo = Repository()
+            val vm = PreviewViewModel(repo)
+            vm.selectWallpaperScene(SceneId.RAPHAEL)
+            runCurrent()
+            assertEquals(0, repo.writes)
+            repo.state.value = SettingsState(loaded = true)
+            vm.selectWallpaperScene(SceneId.RAPHAEL)
+            vm.selectWallpaperFps(PreviewFps.SIXTY)
+            runCurrent()
+            assertEquals(2, repo.writes)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.wallpaper)
+            assertEquals(PreviewSettings(), vm.settings.value.settings)
+            repo.fail = true
+            vm.selectWallpaperScene(SceneId.EXPLORER)
+            runCurrent()
+            assertEquals(SceneId.RAPHAEL, vm.settings.value.wallpaper.scene)
+            assertNotNull(vm.writeError.value)
+            repo.fail = false
+            repo.state.value = repo.state.value.copy(error = IllegalStateException("read failed"))
+            vm.selectWallpaperFps(PreviewFps.THIRTY)
+            runCurrent()
+            assertEquals(3, repo.writes) // a read error blocks wallpaper writes too
         } finally { Dispatchers.resetMain() }
     }
 }
