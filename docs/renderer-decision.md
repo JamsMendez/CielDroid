@@ -7,7 +7,7 @@ Use the implemented, owner-local WebView for the activity preview only. **No wal
 - [Source audit](source-audit.md): the originals combine JavaScript Canvas2D with WebGL nebula rendering in processing and raphael. Mini ignores the FULL pause command and relies on a Linux luminance-key compositor; it is not Android transparency support.
 - [Compiled implementation](../app/src/main/java/com/jamsmendez/cieldroid/scenes/WebViewSceneRuntime.kt): local HTTPS AssetLoader, constrained CSP, one WebView per generation. Compilation and console markers do not prove pixels, GPU behavior or cadence.
 - [WallpaperService.Engine API](https://developer.android.com/reference/android/service/wallpaper/WallpaperService.Engine): supplies SurfaceHolder and surface/visibility/destruction callbacks. A normal [WebView](https://developer.android.com/reference/android/webkit/WebView) is a View; these APIs do not document direct attachment to an arbitrary wallpaper SurfaceHolder.
-- Measured prototype/device evidence: **none**. No offscreen, wallpaper or multi-engine experiment has run.
+- W01 spike (unmeasured): engine surface → private `VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY` VirtualDisplay → `Presentation` hosting the unchanged WebViewSceneRuntime. On the API 35 phone, in the system live-wallpaper preview (portrait only; that activity locks orientation), the idle scene reached READY in about 1 s, the screenshot showed the original scene full-screen, and Back released the display and engine with no CSP/WebGL/crash logcat lines. Landscape resize, FPS, CPU/GPU, memory, battery and multi-engine behavior are **not measured** (W02/W03).
 
 ## Alternatives for phase 3
 

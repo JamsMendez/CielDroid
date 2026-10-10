@@ -162,6 +162,17 @@ semantics set there never reached TalkBack. The decorative WebView is
 OK (9 tests) on the API 35 phone, no app FATAL/Uncaught/CSP logcat. Gaps: no automated ATF
 scan (needs a dependency), no manual TalkBack pass, no translations, no reduced-motion handling.
 
+W01 adds an unmeasured live-wallpaper spike, not an adopted renderer. `SceneWallpaperService`
+renders its engine surface through a private `VirtualDisplay` (`VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY`,
+no permission) and a `Presentation` built from the service context, hosting one
+`WebViewSceneRuntime` + `PreviewController` per generation (fixed idle at 30 fps, no configuration
+UI). The `BIND_WALLPAPER` service and its `scene_wallpaper.xml` metadata are the only manifest
+addition. In the system live-wallpaper preview on the API 35 phone (never applied), the scene
+pixels were visible, readiness reached READY, visibility paused it, and closing the preview
+destroyed the surface and engine and released the display, with no FATAL/CSP/Uncaught/WebGL
+logcat. The preview activity stayed portrait, so resize/landscape is not yet exercised. Nothing
+is measured (W02/W03 pending); single device only.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

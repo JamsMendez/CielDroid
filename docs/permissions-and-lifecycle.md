@@ -1,10 +1,10 @@
 # Activity preview ownership and permission boundaries
 
-The current preview has **no Internet permission, overlay permission or wallpaper service**. Future surfaces are not implemented. Build metadata is evidence about packaging, not running lifecycle behavior.
+The current package has **no Internet or overlay permission**. W01 adds one unmeasured spike wallpaper service (`SceneWallpaperService`, protected by the system `BIND_WALLPAPER` binding permission); overlay and widget are not implemented. Build metadata is evidence about packaging, not running lifecycle behavior.
 
 ## Current package
 
-[Source manifest](../app/src/main/AndroidManifest.xml) declares only MainActivity as the exported launcher, no permissions or services. Independent production APK manifest inspection (pre-chain T3b and C08b–C11, recorded in the [README](../README.md)) confirmed minSdk 35 / targetSdk 37, the sole activity and no Internet/overlay/wallpaper components. AndroidX contributes a signature-only `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, startup provider and DUMP-protected profile installer diagnostic receiver. These are not user-facing services or notification access. AndroidX instrumentation helper activities belong to the separate test APK, not production functionality.
+[Source manifest](../app/src/main/AndroidManifest.xml) declares MainActivity as the exported launcher and, since W01, the `BIND_WALLPAPER`-protected spike wallpaper service; no user-granted permissions. Before W01, independent production APK manifest inspection (pre-chain T3b and C08b–C11, recorded in the [README](../README.md)) confirmed minSdk 35 / targetSdk 37, the sole activity and no Internet/overlay/wallpaper components. AndroidX contributes a signature-only `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, startup provider and DUMP-protected profile installer diagnostic receiver. These are not user-facing services or notification access. AndroidX instrumentation helper activities belong to the separate test APK, not production functionality.
 
 Local HTTPS is an AssetLoader origin, not network use. [WebViewSceneRuntime](../app/src/main/java/com/jamsmendez/cieldroid/scenes/WebViewSceneRuntime.kt) denies unknown/non-GET requests without network fallthrough, file/content access, mixed content, downloads, popups, geolocation, file pickers and permission requests. [ScenePolicy](../app/src/main/java/com/jamsmendez/cieldroid/scenes/ScenePolicy.kt) and [SceneHtml](../app/src/main/java/com/jamsmendez/cieldroid/scenes/SceneHtml.kt) constrain the inventory and exact served-only CSP adaptation. Originals remain unchanged.
 
@@ -24,7 +24,7 @@ Generation numbers belong to a ViewModel, not a process-global identity contract
 ## Future modes: separate investigation
 
 - **Overlay (phase 2):** investigate special overlay permission, user consent/settings flow, background restrictions, any required foreground-service type and current Play policy. Do not assume `specialUse` is justified or request notification access. No permission/service is added here.
-- **Wallpaper (phase 3):** engine-owned SurfaceHolder, visibility and surface lifecycle; each engine needs its own renderer and independent configuration. Renderer feasibility remains open in the [decision record](renderer-decision.md).
+- **Wallpaper (phase 3):** engine-owned SurfaceHolder, visibility and surface lifecycle; each engine needs its own renderer and independent configuration. The W01 spike engine owns one private VirtualDisplay, Presentation, controller and WebView generation, pauses on invisibility and releases them on surface/engine destruction; renderer adoption awaits measurements in the [decision record](renderer-decision.md).
 - **Widget (phase 4):** controlled snapshots through supported widget/RemoteViews mechanisms, not an arbitrary embedded WebView or continuously animated 30/60 FPS widget. Define refresh budgets and cleanup later.
 
 Each future surface must independently pause/release resources and reject stale callbacks. Preview preferences do not implement all-mode configuration; never share a live WebView between activity, overlay, wallpaper engines or widgets.

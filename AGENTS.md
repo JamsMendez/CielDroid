@@ -111,6 +111,15 @@ RED 4/4 assertion failures, GREEN 4/4; full `am instrument` OK (9 tests) on the 
 app FATAL/Uncaught/CSP logcat. Gaps: no ATF scanner (dependency), no manual TalkBack pass, no
 translations, no reduced-motion handling; single device.
 
+W01 spike (unmeasured, not adopted): `wallpaper/SceneWallpaperService` engine surface → private
+`VirtualDisplay` (`OWN_CONTENT_ONLY`, no permission) → `Presentation(service, display)` hosting one
+`WebViewSceneRuntime` + `PreviewController` per generation; fixed idle/30 fps, no settings UI. The
+`BIND_WALLPAPER` service plus `res/xml/scene_wallpaper.xml` is the only manifest addition. System
+preview on the API 35 phone (not applied): scene pixels visible, READY (both markers), visibility
+pause, surface/engine destroy released the display; no FATAL/CSP/Uncaught/WebGL logcat. The
+preview stayed portrait, so surface resize/landscape is unexercised. `DisplayPlanTest` RED→GREEN;
+engine lifecycle is device-only. Cost/cadence/applied engine are W02/W03; single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

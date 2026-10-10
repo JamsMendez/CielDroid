@@ -19,4 +19,5 @@
     <string name="preview_instance">Preview instance: %1$d</string>
     <string name="future_modes">Future modes unavailable</string>
     <string name="future_modes_explanation">Overlay, wallpaper and widget are not implemented. Independent configuration for those owners is deferred.</string>
+    <string name="wallpaper_description">Unmeasured spike: original idle scene at 30 FPS. Not a supported wallpaper yet.</string>
 </resources>
