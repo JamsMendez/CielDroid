@@ -27,18 +27,24 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
 
     fun selectScene(scene: SceneId) = write(PREVIEW_ERROR) { repository.setScene(scene) }
     fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
-    fun selectMode(mode: ActiveMode) = write(MODE_ERROR) { repository.setActiveMode(mode) }
+    /** [onSaved] runs on the main thread only after the mode is persisted; a gated or failed write skips it. */
+    fun selectMode(mode: ActiveMode, onSaved: () -> Unit = {}) =
+        write(MODE_ERROR, onSaved) { repository.setActiveMode(mode) }
 
     fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
 
-    private fun write(errorMessage: String, update: suspend () -> Unit) {
+    private fun write(errorMessage: String, onSuccess: () -> Unit = {}, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
         viewModelScope.launch {
             try {
                 update()
                 mutableWriteError.value = null
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { mutableWriteError.value = errorMessage }
+            catch (_: Exception) {
+                mutableWriteError.value = errorMessage
+                return@launch
+            }
+            onSuccess()
         }
     }
 

@@ -89,9 +89,9 @@ fun CielDroidApp() {
             ModeSection(
                 mode = settings.mode, enabled = enabled,
                 onModeSelected = { mode ->
-                    // Wallpaper mode never leaves the floating mini scene running.
-                    if (mode == ActiveMode.WALLPAPER) context.stopMiniOverlay()
-                    vm.selectMode(mode)
+                    // Wallpaper mode never leaves the floating mini scene running, but the mini is stopped only
+                    // once the mode is saved: a failed write keeps both the stored MINI mode and the running mini.
+                    vm.selectMode(mode) { if (mode == ActiveMode.WALLPAPER) app.stopMiniOverlay() }
                 },
                 wallpaper = {
                     WallpaperControls(

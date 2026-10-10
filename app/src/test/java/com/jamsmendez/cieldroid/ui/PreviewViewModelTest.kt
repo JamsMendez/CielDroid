@@ -102,6 +102,32 @@ class PreviewViewModelTest {
         } finally { Dispatchers.resetMain() }
     }
 
+    // The UI stops the mini overlay from this callback, so it must run only after the mode is persisted.
+    @Test fun modeSavedCallbackRunsOnlyAfterASuccessfulWrite() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val repo = Repository()
+            val vm = PreviewViewModel(repo)
+            var saved = 0
+            vm.selectMode(ActiveMode.WALLPAPER) { saved++ }
+            runCurrent()
+            assertEquals(0, saved) // not loaded: no write, no callback
+            repo.state.value = SettingsState(mode = ActiveMode.MINI, loaded = true)
+            repo.fail = true
+            vm.selectMode(ActiveMode.WALLPAPER) { saved++ }
+            runCurrent()
+            assertEquals(1, repo.writes)
+            assertEquals(ActiveMode.MINI, vm.settings.value.mode)
+            assertEquals(0, saved) // a failed write must not stop the mini
+            repo.fail = false
+            vm.selectMode(ActiveMode.WALLPAPER) { saved++ }
+            assertEquals(0, saved) // nothing runs before the write completes
+            runCurrent()
+            assertEquals(ActiveMode.WALLPAPER, vm.settings.value.mode)
+            assertEquals(1, saved)
+        } finally { Dispatchers.resetMain() }
+    }
+
     @Test fun overlayMoveModeToggleIsGatedAndFailuresAreReported() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {

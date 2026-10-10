@@ -50,9 +50,18 @@ fun Context.openLiveWallpaperPicker(): Boolean = try {
  */
 fun Context.isCielWallpaperActive(): Boolean {
     val manager = WallpaperManager.getInstance(this)
-    return listOf(WallpaperManager.FLAG_SYSTEM, WallpaperManager.FLAG_LOCK)
-        .any { manager.getWallpaperInfo(it)?.packageName == packageName }
+    return ownsAnyWallpaper(packageName, listOf(WallpaperManager.FLAG_SYSTEM, WallpaperManager.FLAG_LOCK)
+        .map { which -> { manager.getWallpaperInfo(which)?.packageName } })
 }
+
+/**
+ * True when any reader returns [ownPackage]. A reader that throws a platform [RuntimeException] (for example a
+ * SecurityException or a failed wallpaper service call) counts as "not ours", so detection never crashes the UI.
+ */
+internal fun ownsAnyWallpaper(ownPackage: String, readers: List<() -> String?>): Boolean =
+    readers.any { read ->
+        try { read() == ownPackage } catch (_: RuntimeException) { false }
+    }
 
 /** Opens the system wallpaper chooser; the user picks another wallpaper there. CielDroid never clears it. */
 fun Context.openWallpaperChooser(): Boolean = try {

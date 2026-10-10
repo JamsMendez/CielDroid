@@ -26,6 +26,9 @@ class BootstrapTest {
     private fun selected(tag: String) =
         compose.onAllNodes(hasTestTag(tag) and isSelected()).fetchSemanticsNodes().isNotEmpty()
 
+    private fun loadedAndSelected(tag: String) =
+        compose.onAllNodes(hasTestTag(tag) and isSelected() and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+
     private fun selectMode(tag: String) {
         compose.onNodeWithTag(tag).performScrollTo().performClick()
         compose.waitUntil(20_000) { selected(tag) }
@@ -33,8 +36,10 @@ class BootstrapTest {
 
     // Switches the persisted mode and restores it; never sets the wallpaper or starts the overlay.
     @Test fun onlyTheSelectedModeControlsAreShownAndTheModePersists() {
-        compose.waitUntil(20_000) { selected("mode-wallpaper") || selected("mode-mini") }
-        val original = if (selected("mode-wallpaper")) "mode-wallpaper" else "mode-mini"
+        // Capture the original only once settings have loaded: before that the chips are disabled and show
+        // the default mode, which would make the finally block restore the wrong mode.
+        compose.waitUntil(20_000) { loadedAndSelected("mode-wallpaper") || loadedAndSelected("mode-mini") }
+        val original = if (loadedAndSelected("mode-wallpaper")) "mode-wallpaper" else "mode-mini"
         try {
             selectMode("mode-mini")
             compose.onNodeWithTag("mode-wallpaper").assertIsNotSelected()
