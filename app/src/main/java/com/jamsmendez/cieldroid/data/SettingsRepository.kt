@@ -21,6 +21,8 @@ interface SettingsRepository {
     suspend fun setFps(fps: PreviewFps)
     suspend fun setWallpaperScene(scene: SceneId)
     suspend fun setWallpaperFps(fps: PreviewFps)
+    suspend fun setOverlayScene(scene: SceneId)
+    suspend fun setOverlayFps(fps: PreviewFps)
     suspend fun setOverlayMoveMode(enabled: Boolean)
     /** Writes x and y in one atomic edit. */
     suspend fun setOverlayPosition(position: OverlayPosition)

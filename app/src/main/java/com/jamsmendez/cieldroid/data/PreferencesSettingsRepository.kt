@@ -19,6 +19,8 @@ class PreferencesSettingsRepository(
     private val fpsKey = intPreferencesKey("preview_fps")
     private val wallpaperSceneKey = stringPreferencesKey("wallpaper_scene")
     private val wallpaperFpsKey = intPreferencesKey("wallpaper_fps")
+    private val overlaySceneKey = stringPreferencesKey("overlay_scene")
+    private val overlayFpsKey = intPreferencesKey("overlay_fps")
     private val overlayMoveModeKey = booleanPreferencesKey("overlay_move_mode")
     private val overlayXKey = intPreferencesKey("overlay_x")
     private val overlayYKey = intPreferencesKey("overlay_y")
@@ -32,12 +34,14 @@ class PreferencesSettingsRepository(
     )
 
     // A position needs both non-negative coordinates; anything else means the default corner.
+    // Scene/FPS decode against the overlay default, never the wallpaper value.
     private fun decodeOverlay(values: Map<String, Any>): OverlaySettings {
         val x = values[overlayXKey.name] as? Int
         val y = values[overlayYKey.name] as? Int
         return OverlaySettings(
             moveMode = values[overlayMoveModeKey.name] as? Boolean ?: false,
             position = if (x != null && y != null && x >= 0 && y >= 0) OverlayPosition(x, y) else null,
+            content = decode(values, overlaySceneKey, overlayFpsKey, PreviewSettings.OVERLAY_DEFAULT),
         )
     }
 
@@ -61,6 +65,8 @@ class PreferencesSettingsRepository(
     override suspend fun setFps(fps: PreviewFps) { store.edit { it[fpsKey] = fps.value } }
     override suspend fun setWallpaperScene(scene: SceneId) { store.edit { it[wallpaperSceneKey] = scene.assetId } }
     override suspend fun setWallpaperFps(fps: PreviewFps) { store.edit { it[wallpaperFpsKey] = fps.value } }
+    override suspend fun setOverlayScene(scene: SceneId) { store.edit { it[overlaySceneKey] = scene.assetId } }
+    override suspend fun setOverlayFps(fps: PreviewFps) { store.edit { it[overlayFpsKey] = fps.value } }
     override suspend fun setOverlayMoveMode(enabled: Boolean) { store.edit { it[overlayMoveModeKey] = enabled } }
     override suspend fun setOverlayPosition(position: OverlayPosition) {
         store.edit {

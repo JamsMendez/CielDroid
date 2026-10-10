@@ -110,7 +110,7 @@ class MiniOverlayService : Service() {
         screenReceiver = receiver
     }
 
-    /** The overlay reuses the wallpaper scene/FPS for now, always as MINI. */
+    /** The overlay follows its own scene/FPS keys (never the wallpaper's), always as MINI. */
     private fun observeSettings() {
         val repository = PreferencesSettingsRepository(applicationContext.settingsPreferences, scope)
         this.repository = repository
@@ -126,10 +126,10 @@ class MiniOverlayService : Service() {
             repository.state
                 .mapNotNull { state ->
                     when {
-                        state.loaded -> state.wallpaper
+                        state.loaded -> state.overlay.content
                         state.error != null -> {
-                            Log.w(TAG, "settings unreadable; using wallpaper defaults", state.error)
-                            PreviewSettings.WALLPAPER_DEFAULT
+                            Log.w(TAG, "settings unreadable; using overlay defaults", state.error)
+                            PreviewSettings.OVERLAY_DEFAULT
                         }
                         else -> null
                     }

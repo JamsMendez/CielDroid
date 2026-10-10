@@ -207,6 +207,11 @@ settings store; the position is restored on start. Clamping it to the screen (on
 change) is display-only and never persisted, so rotating back restores the original spot; only a real
 drag persists a new position.
 
+O03d: the floating mini scene has its own scene and FPS chips, independent of the live wallpaper
+(`overlay_scene`/`overlay_fps` in the shared settings store, default idle at 30 fps). A running overlay
+rebuilds its scene when you change them; move mode and the saved position do not rebuild it. Not yet
+checked on device; `OverlaySectionTest` is compiled, not executed.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

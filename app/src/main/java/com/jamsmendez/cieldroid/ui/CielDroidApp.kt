@@ -87,6 +87,8 @@ fun CielDroidApp() {
                 onSetWallpaper = { pickerUnavailable = !context.openLiveWallpaperPicker() },
             )
             OverlaySection(
+                content = settings.overlay.content, contentEnabled = enabled,
+                onSceneSelected = vm::selectOverlayScene, onFpsSelected = vm::selectOverlayFps,
                 granted = overlayGranted, settingsUnavailable = overlaySettingsUnavailable,
                 moveMode = settings.overlay.moveMode, moveModeEnabled = enabled,
                 onMoveModeChange = vm::setOverlayMoveMode,

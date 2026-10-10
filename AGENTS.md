@@ -149,6 +149,10 @@ O03a: `OverlayPlacement` sizes the WebView at 0.42 × short side inside a 0.95-c
 Persisted `overlay_move_mode` (default off) and `overlay_x`/`overlay_y`; move mode clears
 FLAG_NOT_TOUCHABLE live and `OverlayFrame` intercepts every touch to drag (clamped, saved on UP/CANCEL),
 so the WebView never gets input. Off = pass-through. Drag/persist/pass-through verified once on device (moto g84).
+O03d: independent `overlay_scene`/`overlay_fps` keys (default idle/30; unset or invalid never falls back to the
+wallpaper) in `OverlaySettings.content`; `OverlaySection` chips `overlay-scene-<id>` / `overlay-fps-<n>` mirror
+W04b ("Overlay scene <id>" / "Overlay <n> FPS"). The service follows them (always MINI) and rebuilds only on
+scene/FPS change, not move mode or position; wallpaper keys no longer affect it. `OverlaySectionTest` is compiled only.
 
 ## Change boundaries
 

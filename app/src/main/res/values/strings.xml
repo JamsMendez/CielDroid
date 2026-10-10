@@ -28,7 +28,9 @@
     <string name="wallpaper_set_hint">Opens the system wallpaper preview. You confirm it there; CielDroid never applies it.</string>
     <string name="wallpaper_picker_unavailable">The system live wallpaper picker is unavailable on this device.</string>
     <string name="overlay_title">Floating mini scene</string>
-    <string name="overlay_description">Prototype: shows the mini ring of the wallpaper scene and frame rate above other apps. Touches pass through it unless Move mode is on. Frame rate and battery use are not yet measured.</string>
+    <string name="overlay_description">Prototype: shows the mini ring of the scene and frame rate chosen here, independent of the wallpaper, above other apps. Touches pass through it unless Move mode is on. Frame rate and battery use are not yet measured.</string>
+    <string name="overlay_scene_chip_description">Overlay scene %1$s</string>
+    <string name="overlay_fps_chip_description">Overlay %1$d FPS</string>
     <string name="overlay_permission_missing">Requires the \"Display over other apps\" permission, which you grant in system settings.</string>
     <string name="overlay_grant">Grant overlay permission</string>
     <string name="overlay_start">Start mini scene</string>

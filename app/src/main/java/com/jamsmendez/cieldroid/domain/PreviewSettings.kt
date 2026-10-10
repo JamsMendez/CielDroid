@@ -16,5 +16,8 @@ data class PreviewSettings(
     companion object {
         /** The W01 spike's measured Canvas2D scene; WebGL scenes stay opt-in for the wallpaper. */
         val WALLPAPER_DEFAULT = PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY)
+
+        /** The overlay's own default; an unset overlay key never falls back to the wallpaper value. */
+        val OVERLAY_DEFAULT = PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY)
     }
 }

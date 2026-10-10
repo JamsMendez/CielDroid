@@ -28,6 +28,8 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
     fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
     fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
     fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
+    fun selectOverlayScene(scene: SceneId) = write(OVERLAY_ERROR) { repository.setOverlayScene(scene) }
+    fun selectOverlayFps(fps: PreviewFps) = write(OVERLAY_ERROR) { repository.setOverlayFps(fps) }
 
     fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
 

@@ -7,6 +7,8 @@ data class OverlaySettings(
     val moveMode: Boolean = false,
     /** Null means the default top-end corner. */
     val position: OverlayPosition? = null,
+    /** Scene and FPS, independent of the wallpaper; the service always renders them as MINI. */
+    val content: PreviewSettings = PreviewSettings.OVERLAY_DEFAULT,
 )
 
 data class OverlaySize(val webSide: Int, val windowSide: Int)
