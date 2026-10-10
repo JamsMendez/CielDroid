@@ -13,6 +13,9 @@
     <string name="scene_ready">Draw and bridge ready — visual validation pending</string>
     <string name="scene_failed">Preview failed: %1$s</string>
     <string name="scene_released">Preview released</string>
+    <string name="scene_state_running">Running</string>
+    <string name="scene_state_paused">Paused</string>
+    <string name="scene_viewport_description">Animated %1$s scene preview at %2$d FPS</string>
     <string name="preview_instance">Preview instance: %1$d</string>
     <string name="future_modes">Future modes unavailable</string>
     <string name="future_modes_explanation">Overlay, wallpaper and widget are not implemented. Independent configuration for those owners is deferred.</string>

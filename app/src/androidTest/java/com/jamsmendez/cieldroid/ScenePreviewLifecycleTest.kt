@@ -42,8 +42,8 @@ class ScenePreviewLifecycleTest {
         awaitViewport(RUNNING)
     }
 
-    private fun awaitViewport(state: String) {
-        val matcher = SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, state)
+    private fun awaitViewport(state: Int) {
+        val matcher = SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, compose.activity.getString(state))
         compose.waitForIdle()
         compose.onNodeWithTag("scene-viewport").assert(matcher)
     }
@@ -65,7 +65,7 @@ class ScenePreviewLifecycleTest {
     }
 
     private companion object {
-        const val RUNNING = "running"
-        const val PAUSED = "paused"
+        val RUNNING = R.string.scene_state_running
+        val PAUSED = R.string.scene_state_paused
     }
 }

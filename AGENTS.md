@@ -103,6 +103,14 @@ running, actual paused; GREEN after fix; full `am instrument` OK (5 tests) on th
 no app FATAL/Uncaught/CSP logcat. Viewport-exit ordering is not separately tested. Single device;
 readiness/state semantics are not pixels/GPU/cadence proof.
 
+F01d1 accessibility baseline (semantics only): headings on section titles, scene chips in a
+`selectableGroup`, polite live region on `preview-status`, resource-backed viewport description
+(scene + FPS) and Running/Paused state on a wrapper `Box` (AndroidView semantics are replaced by
+the interop view's platform node), decorative WebView `NO_HIDE_DESCENDANTS`. `AccessibilityTest`
+RED 4/4 assertion failures, GREEN 4/4; full `am instrument` OK (9 tests) on the API 35 phone, no
+app FATAL/Uncaught/CSP logcat. Gaps: no ATF scanner (dependency), no manual TalkBack pass, no
+translations, no reduced-motion handling; single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

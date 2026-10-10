@@ -152,6 +152,16 @@ tests passed and full `am instrument` gave OK (5 tests) on the same API 35 phone
 FATAL/Uncaught/CSP logcat lines. The viewport-exit ordering is reasoned, not separately tested.
 Single device only; readiness and state semantics are not pixel, GPU or cadence proof.
 
+F01d1 adds an accessibility semantics baseline (no visual redesign, no new controls). Section
+titles are headings, scene chips share a `selectableGroup`, `preview-status` is a polite live
+region, and the viewport exposes a resource-backed description (scene + FPS) and Running/Paused
+state on a wrapper `Box`: the interop view replaces an `AndroidView`'s own platform node, so
+semantics set there never reached TalkBack. The decorative WebView is
+`IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS`. `AccessibilityTest` RED: 4/4 assertion failures
+(missing heading, selectable group, live region, description); GREEN 4/4, full `am instrument`
+OK (9 tests) on the API 35 phone, no app FATAL/Uncaught/CSP logcat. Gaps: no automated ATF
+scan (needs a dependency), no manual TalkBack pass, no translations, no reduced-motion handling.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

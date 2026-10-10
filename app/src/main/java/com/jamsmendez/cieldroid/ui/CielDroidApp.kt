@@ -2,6 +2,7 @@ package com.jamsmendez.cieldroid.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,18 +38,22 @@ fun CielDroidApp() {
         ) {
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.semantics { heading() })
-            Text(stringResource(R.string.preview_title), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.preview_title), style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.validation_pending))
             if (!settings.loaded) Text(stringResource(if (settings.error == null)
                 R.string.settings_loading else R.string.settings_read_error))
             writeError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Text(stringResource(R.string.scene_label), style = MaterialTheme.typography.titleMedium)
-            SceneId.entries.forEach { scene ->
-                FilterChip(
-                    selected = enabled && settings.settings.scene == scene,
-                    onClick = { vm.selectScene(scene) }, enabled = enabled,
-                    label = { Text(scene.assetId) }, modifier = Modifier.fillMaxWidth(),
-                )
+            Text(stringResource(R.string.scene_label), style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() })
+            Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                SceneId.entries.forEach { scene ->
+                    FilterChip(
+                        selected = enabled && settings.settings.scene == scene,
+                        onClick = { vm.selectScene(scene) }, enabled = enabled,
+                        label = { Text(scene.assetId) }, modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 PreviewFps.entries.forEach { fps ->
@@ -66,7 +71,8 @@ fun CielDroidApp() {
             if (enabled) key(generation) {
                 ScenePreview(settings.settings, generation, manuallyPaused)
             }
-            Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.future_modes_explanation))
         }
     }

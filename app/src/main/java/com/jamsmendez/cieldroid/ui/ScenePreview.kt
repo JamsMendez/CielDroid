@@ -1,6 +1,9 @@
 package com.jamsmendez.cieldroid.ui
 
+import android.view.View
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
@@ -12,6 +15,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.jamsmendez.cieldroid.R
@@ -64,6 +70,8 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
         controller.manualPause(manuallyPaused)
         controller.ownerResumed(visible)
     }
+    val viewportDescription = stringResource(R.string.scene_viewport_description, settings.scene.assetId, settings.fps.value)
+    val viewportState = stringResource(if (session.ownerResumed) R.string.scene_state_running else R.string.scene_state_paused)
     Column {
         Text(
             when (session.phase) {
@@ -72,14 +80,18 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
                 SessionPhase.ERROR -> stringResource(R.string.scene_failed, session.error.orEmpty())
                 SessionPhase.DISPOSED -> stringResource(R.string.scene_released)
             },
-            modifier = Modifier.testTag("preview-status"),
+            modifier = Modifier.testTag("preview-status").semantics { liveRegion = LiveRegionMode.Polite },
         )
         Text(stringResource(R.string.preview_instance, generation), modifier = Modifier.testTag("preview-generation"))
-        AndroidView(
-            factory = { runtime.view.also { runtime.load() } },
+        Box(
+            // Semantics live on this wrapper: the interop view replaces the AndroidView's own
+            // node in the platform accessibility tree, dropping semantics set on AndroidView.
             modifier = Modifier.fillMaxWidth().height(300.dp).testTag("scene-viewport")
-                // Test-observable owner state; not a visible control.
-                .semantics { stateDescription = if (session.ownerResumed) "running" else "paused" }
+                // Owner state for tests and assistive technology; not a visible control.
+                .semantics {
+                    contentDescription = viewportDescription
+                    stateDescription = viewportState
+                }
                 .onGloballyPositioned { coordinates ->
                     val bounds = coordinates.boundsInRoot()
                     val root = coordinates.findRootCoordinates().size
@@ -87,8 +99,20 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
                         bounds.bottom > 0 && bounds.top < root.height &&
                         bounds.right > 0 && bounds.left < root.width
                 },
-            onRelease = { controller.dispose() },
-            update = {},
-        )
+        ) {
+            AndroidView(
+                factory = {
+                    // Decorative animation without interactive content: TalkBack announces only
+                    // the wrapper description and state, never the upstream DOM.
+                    runtime.view.also {
+                        it.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                        runtime.load()
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+                onRelease = { controller.dispose() },
+                update = {},
+            )
+        }
     }
 }
