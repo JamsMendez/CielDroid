@@ -57,7 +57,7 @@ closure is not dynamic runtime proof.
 
 ## Build and verification
 
-Use the checked-in wrapper and installed SDK platform 37 / Build Tools 36.0.0.
+Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
 The daemon requires JDK 25; JDK 26 launcher compatibility is historical evidence.
 Gradle 9.6.0 / AGP 9.4.1 are pinned. AGP uses built-in Kotlin 2.2.10; the
 Compose compiler matches Kotlin, independently of the Compose BOM.
@@ -143,7 +143,7 @@ not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writ
 I02's failed historical directory-mtime gate and human-qualified continuation.
 C08a functional checks, provenance and attestation passed; native review/local commit
 closed at `6e1f6f0`. This does not approve C08b.
-C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
+Historical C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
 forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
 Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
 lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
@@ -162,10 +162,23 @@ including roots and Git pointer, had zero current drift. Only authorized ignored
 build/cache outputs changed; pre-existing `.atl` was unchanged. Working-root/app-directory
 mtime/size changes from cache creation are not source/Git metadata drift, nor proof of
 filesystem-wide immutability. Historical C05/C06a/I02 qualifications above still apply.
-C08b functional checks, provenance and attestation passed; final identity verification,
-native closure and local commit remain pending. This is not C08b approval.
+C08b final identity verification and native approval/exact acknowledgement (burned)
+closed in local commit `9fc80fb`; this does not approve C09.
 Component import alone proves neither Full visual behavior nor GPU compatibility.
-`tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
+C09 includes the unchanged [asset verifier](tools/verify_scene_assets.py),
+[source audit](docs/source-audit.md) and [CI workflow](.github/workflows/android.yml).
+C09's first isolated validators (default and `--source`) exited 0: 56 files /
+940651 bytes / 57 references; source mode proves checkout equality, not a revision.
+Separate catalog/committed-upstream/production-APK checks match all 56 originals;
+test APK assets: zero. All 13 characterization cases and four offline wrapper
+checks passed: eight fresh host tests (seven functional), no failures/errors/skips;
+lint 0 errors/24 warnings. Binary manifests and four JDK 25 daemon requests were
+attested; production is not permission-free, and test compilation is not execution.
+I03's strict audit exited 1 solely for common `.git` root directory mtime drift;
+writer unknown. All 109 source/index entries, HEAD, staged status, pure tree and
+other Git metadata were unchanged; outputs were only ignored build/cache files.
+Human accepted candidate-specific qualified continuation, not a retroactive pass
+or blanket waiver. Final input verification, native review and local commit remain pending.
 Final UI documentation restoration belongs to C13/C14, not this slice.
 
 ## Scope and distribution limits
@@ -174,5 +187,10 @@ The application ID is `com.jamsmendez.cieldroid`; compile/target SDK are 37.
 The source manifest requests no permissions or services. Public stability and
 publishing eligibility of the exact AGP/API versions remain unverified, as does
 distribution licensing for upstream scene JavaScript. No remote CI execution
-is established, and no CI workflow is included in this slice. Do not infer
-publication readiness from local builds. See [contributor constraints](AGENTS.md).
+is established. CI pins four actions to researched immutable commits, retains JDK 25
+and the wrapper, and compiles the example instrumentation APK without device execution.
+Google's published stable-channel SDK metadata confirms `android-37.0` revision 2
+and Build Tools 36.0.0; this is not remote execution or AGP compatibility proof.
+The Ubuntu 24.04 image still floats; Java/SDK/Gradle inputs are not fully immutable.
+Retained setup-java v4 is deprecated: a maintenance risk, not an authorized major upgrade.
+Do not infer publication readiness from local builds. See [contributor constraints](AGENTS.md).

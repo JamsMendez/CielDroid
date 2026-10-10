@@ -49,7 +49,7 @@ Future untracked files must survive; they are not verification for this slice.
 
 Use the wrapper commands in [README](README.md) against the isolated candidate,
 not ambient future sources. JDK 25 is required for the daemon; JDK 26 launcher
-compatibility is historical. SDK platform 37 / Build Tools 36.0.0 are required.
+compatibility is historical. SDK package `platforms;android-37.0` / Build Tools 36.0.0 are required.
 Historically, C03's four checks passed: eight fresh host tests (seven functional),
 no failures, errors or skips and lint 0 errors/34 warnings.
 C04's four checks also passed;
@@ -101,7 +101,7 @@ not erase C05's unknown pre-write-tree history, C06a's unknown object-mtime writ
 I02's failed historical directory-mtime gate and human-qualified continuation.
 C08a functional checks, provenance and attestation passed; native review/local commit
 closed at 6e1f6f0, not C08b approval.
-C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
+Historical C08b: four separate isolated offline wrapper checks exited 0: assemble 36 tasks executed,
 forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
 Eight fresh host tests (seven functional, one arithmetic) had no failures/errors/skips;
 lint 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
@@ -120,10 +120,18 @@ roots and Git pointer, had zero current drift. Only authorized ignored build/cac
 outputs changed; pre-existing `.atl` was unchanged. Working-root/app-directory mtime/size
 changes from cache creation are not source/Git metadata drift or filesystem-wide
 immutability. Historical C05/C06a/I02 qualifications above remain valid.
-C08b functional checks, provenance and attestation passed; final identity verification,
-native closure and local commit remain pending, not C08b approval.
+C08b final identity verification/native approval/exact acknowledgement (burned) and
+local commit closed at 9fc80fb, not C09 approval.
 Whole-component import is not Full visual/GPU proof; no runtime controls are added.
-The full asset verifier requires all 56 files and first applies at C09.
+C09 includes the unchanged [verifier](tools/verify_scene_assets.py),
+[audit](docs/source-audit.md) and [CI](.github/workflows/android.yml). Both first isolated
+validators, separate committed-upstream/catalog/APK provenance, 13 characterization
+cases and four offline wrapper checks passed; manifests and four JDK 25 requests
+were attested. Eight fresh host tests (seven functional) had no failures/errors/skips;
+lint 0 errors/24 warnings. I03 strict audit exited 1 solely for common `.git` root
+directory mtime drift, writer unknown; 109 source/index entries and other Git metadata
+were unchanged. Human accepted candidate-specific qualified continuation, not a gate
+pass or blanket waiver; final input verification, native review and local commit are pending.
 Final UI documentation restoration remains C13/C14 work, not this slice.
 The arithmetic example is not functional.
 Build output and test APK assembly do not prove device behavior. Report failures
