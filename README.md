@@ -198,8 +198,8 @@ comes from a separate adaptation stylesheet (`assets/adaptations/mini-transparen
 originals are unchanged. Limits: plain service without a foreground notification (the system may stop
 it); dark ring bases look stronger than the Linux luminance key; fps and energy unmeasured; one device.
 
-O03a: the scene WebView is 0.42 × the screen short side; the window is 0.86 of that (outer glow
-rays are trimmed at the square edges; the ring disc stays whole) and defaults to the top end, 4 dp
+O03a: the scene WebView is 0.42 × the screen short side; the window is 0.95 of that (only the
+outermost edge fade is cropped; the ring disc stays whole) and defaults to the top end, 4 dp
 from the edge below the status bar. "Move mode" (off by default) makes the ring draggable and blocks
 touches under it; turn it off to let touches pass through again. The window position
 (`overlay_x`/`overlay_y`, absolute pixels) and the switch (`overlay_move_mode`) persist in the shared

@@ -17,9 +17,9 @@ object OverlayPlacement {
 
     /**
      * Window side as a fraction of the scene side. The mini ring disc ends at 0.40 of the scene side and its
-     * fade at 0.48, so 0.86 keeps content up to radius ~0.43 and crops most of the transparent border.
+     * fade at 0.48, so 0.95 keeps content up to radius ~0.475 (outer glow fades before the edge) and crops the rest.
      */
-    const val WINDOW_CROP = 0.86f
+    const val WINDOW_CROP = 0.95f
 
     /** Default distance from the top and end screen edges. */
     const val EDGE_MARGIN_DP = 4

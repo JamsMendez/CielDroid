@@ -5,10 +5,10 @@ import org.junit.Test
 
 class OverlayPlacementTest {
     @Test fun sizeKeepsTheSceneAtTheRequestedFractionAndCropsTheWindow() {
-        // 1080 px short side: scene 0.42 × 1080 = 453 px, window 0.86 × 453 = 389 px.
-        assertEquals(OverlaySize(webSide = 453, windowSide = 389), OverlayPlacement.size(1080))
+        // 1080 px short side: scene 0.42 × 1080 = 453 px, window 0.95 × 453 = 430 px.
+        assertEquals(OverlaySize(webSide = 453, windowSide = 430), OverlayPlacement.size(1080))
         assertEquals(0.42f, OverlayPlacement.SCENE_FRACTION)
-        assertEquals(0.86f, OverlayPlacement.WINDOW_CROP)
+        assertEquals(0.95f, OverlayPlacement.WINDOW_CROP)
         assertEquals(4, OverlayPlacement.EDGE_MARGIN_DP)
         assertEquals(OverlaySize(0, 0), OverlayPlacement.size(0))
     }
