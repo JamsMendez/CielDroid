@@ -112,8 +112,20 @@ four offline wrapper checks (assemble 36 executed, forced host 24, lint 9/18, te
 30/20), 16 fresh host tests (15 functional) with zero failures/errors/skips and lint
 0 errors/8 warnings (7 UnusedResources, 1 ObsoleteSdkInt), none in C13 files. The test
 APK packages both tests; the production APK keeps 56 assets / 940651 bytes. Native
-review and local commit are pending. Architecture documentation is deferred to C14. Device, visual/GPU/WebGL,
+approval/exact acknowledgement (burned) and local commit closed at `1dab560`. Device, visual/GPU/WebGL,
 cadence, lifecycle and accessibility acceptance remain pending; readiness is not pixels proof.
+
+C14 consolidates the evidence documentation: [architecture](docs/architecture.md),
+[permissions and lifecycle](docs/permissions-and-lifecycle.md),
+[renderer decision](docs/renderer-decision.md) and [test plan](docs/test-plan.md),
+audited against the committed C03–C13 code and the C13 check results. C14 device gates
+remain pending because no device or adb was available: `./gradlew :app:connectedDebugAndroidTest`
+on a physical device, launch, light/dark themes, scene/FPS switching, pause/resume/retry,
+background/return, rotation and visual fidelity. Independent isolated C14 verification
+passed four offline wrapper checks (assemble 36 executed, forced host 24, lint 9/18, test
+APK 30/20), 16 fresh host tests with zero failures/errors/skips, lint 0 errors/8 warnings
+and 56 assets / 940651 bytes; the comment-only `rules.keep` has no effect (minify off).
+Native review and local commit are pending.
 
 ## Build and verification
 

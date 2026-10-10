@@ -71,10 +71,18 @@ C12 adapter per generation (scene/FPS, Pause/Resume, Retry). `BootstrapTest` rep
 `ExampleInstrumentedTest`; it and `ScenePreviewTest` are compiled-only instrumentation,
 never executed on a device. Independent isolated C13 checks passed: four offline wrapper
 checks, 16 fresh host tests (15 functional), zero failures/errors/skips, lint 0 errors/8
-warnings; test APK packages both tests; production APK keeps 56 assets. Native review
-and local commit pending;
-`docs/architecture.md` is deferred to C14. Device, visual/GPU/WebGL, cadence,
+warnings; test APK packages both tests; production APK keeps 56 assets. Native
+approval/exact acknowledgement (burned) and local commit closed at `1dab560`. Device, visual/GPU/WebGL, cadence,
 lifecycle and accessibility acceptance remain pending; readiness is not pixels proof.
+
+C14 consolidates `docs/architecture.md`, `docs/permissions-and-lifecycle.md`,
+`docs/renderer-decision.md` and `docs/test-plan.md` (linked from README), audited against
+committed code and C13 results. C14 device gates remain pending (no device/adb available):
+`./gradlew :app:connectedDebugAndroidTest` on a physical device, launch, light/dark,
+scene/FPS switching, pause/resume/retry, background, rotation and visual fidelity.
+Independent isolated C14 checks passed: four offline wrapper checks, 16 fresh host
+tests, zero failures/errors/skips, lint 0 errors/8 warnings, 56 assets; comment-only
+`rules.keep` has no effect (minify off). Native review and local commit pending.
 
 ## Change boundaries
 
