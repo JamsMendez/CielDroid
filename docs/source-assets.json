@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "source_checkout": "/home/jamsmendez/Documents/OS/CosmicLinux/CieLinux",
+    "referenced_revision": "a31faf964ff376dc3443c9939377e9d76f36a95f",
+    "observed_head": "a31faf964ff376dc3443c9939377e9d76f36a95f",
+    "tracked_worktree_clean": true,
+    "untracked_paths": [
+      ".atl/.skill-registry.cache.json",
+      ".atl/skill-registry.md",
+      "odd/plans/versioned-releases.md"
+    ],
+    "copied_files_match_committed_revision": true,
+    "method": "Each checkout file was compared byte-for-byte with git show REV:path before copying; destinations are unmodified copies.",
+    "reuse_authorization": "User explicitly authorized scene/resource copying for CielDroid; public distribution rights remain unresolved.",
+    "retained_font_license": "scenes/shared/fonts/OFL.txt",
+    "general_license": null
+  },
+  "totals": {
+    "files": 56,
+    "bytes": 940651
+  },
+  "files": [
+    {
+      "source_path": "scenes/explorer/index.html",
+      "destination_path": "app/src/main/assets/scenes/explorer/index.html",
+      "bytes": 950,
+      "sha256": "0855c2fc59e1d92e25b0040610dbbcd218963fb733ebf89d443077a352cbd189"
+    },
+    {
+      "source_path": "scenes/explorer/js/animate.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/animate.js",
+      "bytes": 43964,
+      "sha256": "8aacd072d126d1d2676a862ddf1e8f39e6be0c3693d0156ba02e07d72db9f732"
+    },
+    {
+      "source_path": "scenes/explorer/js/config.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/config.js",
+      "bytes": 42205,
+      "sha256": "a78dd46f74c8063a1134f015a35198bb5f2e17da7e08f9f0cf6b19eddd2c0044"
+    },
+    {
+      "source_path": "scenes/explorer/js/earth.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/earth.js",
+      "bytes": 24658,
+      "sha256": "664b7a66e951624ab3ad8f228a97b3f42914387498c6810439af0471ae0c265b"
+    },
+    {
+      "source_path": "scenes/explorer/js/glyphs.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/glyphs.js",
+      "bytes": 11091,
+      "sha256": "99ad743bff502854b72af11edc72a03aff14d5fdc552153dc445677696a4fc55"
+    },
+    {
+      "source_path": "scenes/explorer/js/main.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/main.js",
+      "bytes": 1914,
+      "sha256": "2eee53ac0f3b37ec123445838048f7c2cef4a37bbd04e26d2037fe474cd49ae0"
+    },
+    {
+      "source_path": "scenes/explorer/js/math.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/math.js",
+      "bytes": 3781,
+      "sha256": "fb643e65a3677d4b4f34b251d182ae08985ff323f1dcbff4adcf8ae47d1fd220"
+    },
+    {
+      "source_path": "scenes/explorer/js/render-loop.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/render-loop.js",
+      "bytes": 7340,
+      "sha256": "57a5b7cdd9298039b93104153f8505c8d5e2989e28f6b22e818af917f3795475"
+    },
+    {
+      "source_path": "scenes/explorer/js/rings.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/rings.js",
+      "bytes": 42228,
+      "sha256": "e17b469e45a21df9cca259b1b8b0a48d4104e75ab92166fb089dbb42e702ad9b"
+    },
+    {
+      "source_path": "scenes/explorer/js/rising-sparks.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/rising-sparks.js",
+      "bytes": 28117,
+      "sha256": "8f78bfa357a698354107185a9a76f468c7b01a309aedf3cb9b537486c9f202ad"
+    },
+    {
+      "source_path": "scenes/explorer/js/see-through-hook.js",
+      "destination_path": "app/src/main/assets/scenes/explorer/js/see-through-hook.js",
+      "bytes": 2099,
+      "sha256": "ed84a11b88591a9dd5648f04e13379a33a6e9f32b7301c60da12ff544891ab1e"
+    },
+    {
+      "source_path": "scenes/explorer/styles.css",
+      "destination_path": "app/src/main/assets/scenes/explorer/styles.css",
+      "bytes": 893,
+      "sha256": "30e5e657dfaee9d0a74db4815575ec66ae7fdb806d4d6dd8774eb1408e30ee8c"
+    },
+    {
+      "source_path": "scenes/idle/index.html",
+      "destination_path": "app/src/main/assets/scenes/idle/index.html",
+      "bytes": 898,
+      "sha256": "532df46799d6492b540273d38c1005e1ae47e084da3fcbcc395bca5e73d57791"
+    },
+    {
+      "source_path": "scenes/idle/js/animate.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/animate.js",
+      "bytes": 41170,
+      "sha256": "75fd26dd8295abbb5751cf39fc44cd021b44f8dcb7dd3bd04090f9eed02f691e"
+    },
+    {
+      "source_path": "scenes/idle/js/config.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/config.js",
+      "bytes": 40130,
+      "sha256": "1abc6c847879e96cd1ff5088c46a5b77c7c19de370e44488c03af31bd38a3a1a"
+    },
+    {
+      "source_path": "scenes/idle/js/earth.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/earth.js",
+      "bytes": 23122,
+      "sha256": "ab076276fc5d037782f9228699881d19fc8ea7e242ba59dcd494099faa46bb1d"
+    },
+    {
+      "source_path": "scenes/idle/js/glyphs.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/glyphs.js",
+      "bytes": 11089,
+      "sha256": "57284fa7cdceede3f0d79e4a95bf7df717ef35f69b8d2ac5cb492ea508f95b86"
+    },
+    {
+      "source_path": "scenes/idle/js/main.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/main.js",
+      "bytes": 1809,
+      "sha256": "15f472543e2d53fab4157ade61bcda125be14306d3d3dc12d2e7ab7288ace698"
+    },
+    {
+      "source_path": "scenes/idle/js/math.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/math.js",
+      "bytes": 3779,
+      "sha256": "5507d42ea5685aac5af4a132c0fc2b8dff62b50ce9503e4666a46c3c24f52e91"
+    },
+    {
+      "source_path": "scenes/idle/js/render-loop.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/render-loop.js",
+      "bytes": 7340,
+      "sha256": "57a5b7cdd9298039b93104153f8505c8d5e2989e28f6b22e818af917f3795475"
+    },
+    {
+      "source_path": "scenes/idle/js/rings.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/rings.js",
+      "bytes": 41935,
+      "sha256": "cebf294e99feae3defdafa3cba29d6375774ed2d5f1a5803a5d35206843431ae"
+    },
+    {
+      "source_path": "scenes/idle/js/see-through-hook.js",
+      "destination_path": "app/src/main/assets/scenes/idle/js/see-through-hook.js",
+      "bytes": 3799,
+      "sha256": "c5e775a40e4f25d6698c8b943bccc3645043f9213a2192442395e9007d0aecd5"
+    },
+    {
+      "source_path": "scenes/idle/styles.css",
+      "destination_path": "app/src/main/assets/scenes/idle/styles.css",
+      "bytes": 889,
+      "sha256": "90bb02a4a820420c9efb78ac3a721918f315745dae524f25f112fe0a9a603dfa"
+    },
+    {
+      "source_path": "scenes/processing/index.html",
+      "destination_path": "app/src/main/assets/scenes/processing/index.html",
+      "bytes": 1016,
+      "sha256": "614b01bb73a3e5028b07e23bda9c83969079190629f0130d1362c3152e43bcad"
+    },
+    {
+      "source_path": "scenes/processing/js/config.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/config.js",
+      "bytes": 17698,
+      "sha256": "7bc8567353f200d0d96942d452c321bc614e9fab8be2d05c58ec5c57f38ae4d2"
+    },
+    {
+      "source_path": "scenes/processing/js/layers.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/layers.js",
+      "bytes": 59101,
+      "sha256": "8a426f212cd6c6326be3befe2a61d1e1b1413af5e8114e04b5c5225ee97ca6d4"
+    },
+    {
+      "source_path": "scenes/processing/js/main.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/main.js",
+      "bytes": 6792,
+      "sha256": "d3482bafe9ce3dbe7d6642f6370a47f7a1c9c502fa8f841ceb92e11f7011ce9e"
+    },
+    {
+      "source_path": "scenes/processing/js/math.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/math.js",
+      "bytes": 1018,
+      "sha256": "10951705adf6a91c232909443cc34fb4b54b185c2e219508330aed2e38dfc20f"
+    },
+    {
+      "source_path": "scenes/processing/js/nebula.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/nebula.js",
+      "bytes": 14406,
+      "sha256": "f7b064e7fbf1674ba1577e873006873a96a77e01da50c955febdce71405d99b8"
+    },
+    {
+      "source_path": "scenes/processing/js/render-loop.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/render-loop.js",
+      "bytes": 7340,
+      "sha256": "57a5b7cdd9298039b93104153f8505c8d5e2989e28f6b22e818af917f3795475"
+    },
+    {
+      "source_path": "scenes/processing/js/scene-data.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/scene-data.js",
+      "bytes": 8145,
+      "sha256": "de7018c6f1079238acdd70db64dcffbae719099df5c4ded97b75c07e4d19451b"
+    },
+    {
+      "source_path": "scenes/processing/js/see-through-hook.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/see-through-hook.js",
+      "bytes": 2499,
+      "sha256": "6875a4bc7713a289a88b3c2a0c7c4b6a3d3082f8e75450b6be2d4b4b823c12ff"
+    },
+    {
+      "source_path": "scenes/processing/js/sphere.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/sphere.js",
+      "bytes": 13655,
+      "sha256": "daf83b2c906eb0ed5bf1bf528f4a761f62190f98c9e6a29f8c0df82480c90304"
+    },
+    {
+      "source_path": "scenes/processing/js/sprites.js",
+      "destination_path": "app/src/main/assets/scenes/processing/js/sprites.js",
+      "bytes": 21054,
+      "sha256": "7f726fff73672a38222af511a7861d04b3cbf525a78f892f3ccd314b36261cc4"
+    },
+    {
+      "source_path": "scenes/processing/styles.css",
+      "destination_path": "app/src/main/assets/scenes/processing/styles.css",
+      "bytes": 1048,
+      "sha256": "5e1226a55afccd04daf481e384a71a804adca68b98578d06f081a46571bdbc2e"
+    },
+    {
+      "source_path": "scenes/raphael/index.html",
+      "destination_path": "app/src/main/assets/scenes/raphael/index.html",
+      "bytes": 1250,
+      "sha256": "5b4086f85306ed416c7153df4154d4c22ea406b978f07e2cfb849cd90cd7d0e9"
+    },
+    {
+      "source_path": "scenes/raphael/js/central-core.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/central-core.js",
+      "bytes": 3065,
+      "sha256": "76d8ec4b30810e005b0b9c5c69bc0568f9e05947a3b9e0765613011f7cff2bf8"
+    },
+    {
+      "source_path": "scenes/raphael/js/config.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/config.js",
+      "bytes": 45614,
+      "sha256": "a4db30f066cb0db05fc64f02d9b7c2769c912c5f3cd7876945948e5c9aa83edc"
+    },
+    {
+      "source_path": "scenes/raphael/js/digits.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/digits.js",
+      "bytes": 4612,
+      "sha256": "f042fa5afc0c1666065f939d396882723ae722dae8a20e431606aeb1ca3394fd"
+    },
+    {
+      "source_path": "scenes/raphael/js/feathers.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/feathers.js",
+      "bytes": 17582,
+      "sha256": "bd0080b4c2d08311fa8a62f56814f16e9bf9fb4d5956f6aa740f61f3e4e613c2"
+    },
+    {
+      "source_path": "scenes/raphael/js/glyph-rings.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/glyph-rings.js",
+      "bytes": 13103,
+      "sha256": "fd53bc0dcc4e23656db92c1a15c34175a1c980829d1545631963f0b2e19331b9"
+    },
+    {
+      "source_path": "scenes/raphael/js/glyphs.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/glyphs.js",
+      "bytes": 23053,
+      "sha256": "d0d434c668c2cf2b7a7afc004daf620050d0de62c07bf71b045f1082daf3b265"
+    },
+    {
+      "source_path": "scenes/raphael/js/hexadecagon.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/hexadecagon.js",
+      "bytes": 4624,
+      "sha256": "16f3df7983f4d9bd113ff831cbd224ffca0f032b1e2edd38e3facff241a74999"
+    },
+    {
+      "source_path": "scenes/raphael/js/layers.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/layers.js",
+      "bytes": 58540,
+      "sha256": "aff3013c638f8780fb0cba5d7468a8cf55cdb08c43db3deb47b3746704affa1a"
+    },
+    {
+      "source_path": "scenes/raphael/js/main.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/main.js",
+      "bytes": 7780,
+      "sha256": "0f1f9a34e03cde2e5347a920bc223c597116e97886a77300089fd0dab89f1fdc"
+    },
+    {
+      "source_path": "scenes/raphael/js/math.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/math.js",
+      "bytes": 1006,
+      "sha256": "d2bef6c68490200c732b3f3dd906b1ab77bfb8bcc7353f3313e55a4e0be20f1e"
+    },
+    {
+      "source_path": "scenes/raphael/js/nebula.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/nebula.js",
+      "bytes": 19590,
+      "sha256": "c4d77e027aedae65b51f5217a28dcab358c9b00586aea06f13e25eff2c534497"
+    },
+    {
+      "source_path": "scenes/raphael/js/render-loop.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/render-loop.js",
+      "bytes": 7340,
+      "sha256": "57a5b7cdd9298039b93104153f8505c8d5e2989e28f6b22e818af917f3795475"
+    },
+    {
+      "source_path": "scenes/raphael/js/scene-data.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/scene-data.js",
+      "bytes": 8425,
+      "sha256": "83ce96f8fdb11246bca17e733f504b9f87297c5fc5c4edf29318630ffaafb62e"
+    },
+    {
+      "source_path": "scenes/raphael/js/see-through-hook.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/see-through-hook.js",
+      "bytes": 5070,
+      "sha256": "62af26dab6e1936cd4ceae02acae339c92a1981fa585befe5b78bd366e54fc9f"
+    },
+    {
+      "source_path": "scenes/raphael/js/sphere.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/sphere.js",
+      "bytes": 1586,
+      "sha256": "130aa6b7822ce0a161ef62ab2bf42d31cfe2786796d2f50fa16f86025f2c4645"
+    },
+    {
+      "source_path": "scenes/raphael/js/sprites.js",
+      "destination_path": "app/src/main/assets/scenes/raphael/js/sprites.js",
+      "bytes": 29788,
+      "sha256": "f2ece2e0cf0680b49e42fc7e4832d0b55980c4c9f797008268621a92c3925aa5"
+    },
+    {
+      "source_path": "scenes/raphael/styles.css",
+      "destination_path": "app/src/main/assets/scenes/raphael/styles.css",
+      "bytes": 1045,
+      "sha256": "14bf51d5da0493674c8d919dc00a2f8c411c915ca77948db245bf1de1ed6cd9b"
+    },
+    {
+      "source_path": "scenes/shared/fonts/ArchivoBlack-Regular.ttf",
+      "destination_path": "app/src/main/assets/scenes/shared/fonts/ArchivoBlack-Regular.ttf",
+      "bytes": 90988,
+      "sha256": "dd9a89a019b4849f66ab75455fe7bdf931311042cbb0f0f97acc061539703180"
+    },
+    {
+      "source_path": "scenes/shared/fonts/OFL.txt",
+      "destination_path": "app/src/main/assets/scenes/shared/fonts/OFL.txt",
+      "bytes": 4399,
+      "sha256": "4eb085b4f06e3c1625d8b577902bf639d480633635837bf2ed94d1a7b1b842f5"
+    },
+    {
+      "source_path": "scenes/shared/js/alert-overlay.js",
+      "destination_path": "app/src/main/assets/scenes/shared/js/alert-overlay.js",
+      "bytes": 53219,
+      "sha256": "341aaf910da64c2614526a8198460e27d4ce2e8dad3695a3474d0d14a312c2da"
+    }
+  ]
+}
