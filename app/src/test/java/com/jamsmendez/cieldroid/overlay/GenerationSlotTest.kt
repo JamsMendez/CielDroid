@@ -60,6 +60,43 @@ class GenerationSlotTest {
         assertEquals(listOf("one"), released)
     }
 
+    @Test fun activateStartsTheInstalledGeneration() {
+        val released = mutableListOf<String>()
+        val started = mutableListOf<String>()
+        val slot = GenerationSlot<Part> { released += it.name }
+        val one = Part("one")
+        slot.begin(1)
+        assertTrue(slot.activate(1, one) { started += it.name })
+        assertSame(one, slot.current)
+        assertEquals(listOf("one"), started)
+        assertEquals(emptyList<String>(), released)
+    }
+
+    @Test fun activateReleasesTheGenerationExactlyOnceWhenStartThrows() {
+        val released = mutableListOf<String>()
+        val slot = GenerationSlot<Part> { released += it.name }
+        slot.begin(1)
+        // e.g. ownerResumed throws after the window was added: the installed generation must not leak.
+        assertFalse(slot.activate(1, Part("one")) { error("start failed") })
+        assertNull(slot.current)
+        assertNull(slot.currentId)
+        assertFalse(slot.fail(1)) // a late error callback is a no-op
+        assertFalse(slot.clear())
+        assertEquals(listOf("one"), released)
+    }
+
+    @Test fun activateDoesNotStartAGenerationThatFailedWhileBuilding() {
+        val released = mutableListOf<String>()
+        val started = mutableListOf<String>()
+        val slot = GenerationSlot<Part> { released += it.name }
+        slot.begin(1)
+        assertTrue(slot.fail(1))
+        assertFalse(slot.activate(1, Part("one")) { started += it.name })
+        assertNull(slot.current)
+        assertEquals(emptyList<String>(), started)
+        assertEquals(listOf("one"), released)
+    }
+
     @Test fun beginReleasesThePreviousGenerationAndAbortForgetsAFailedBuild() {
         val released = mutableListOf<String>()
         val slot = GenerationSlot<Part> { released += it.name }

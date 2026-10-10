@@ -203,7 +203,9 @@ outermost edge fade is cropped; the ring disc stays whole) and defaults to the t
 from the edge below the status bar. "Move mode" (off by default) makes the ring draggable and blocks
 touches under it; turn it off to let touches pass through again. The window position
 (`overlay_x`/`overlay_y`, absolute pixels) and the switch (`overlay_move_mode`) persist in the shared
-settings store; the position is restored on start and re-clamped on screen-size changes.
+settings store; the position is restored on start. Clamping it to the screen (on start or a screen-size
+change) is display-only and never persisted, so rotating back restores the original spot; only a real
+drag persists a new position.
 
 ## Build and verification
 

@@ -1,7 +1,6 @@
 package com.jamsmendez.cieldroid.domain
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class OverlayPlacementTest {
@@ -30,12 +29,5 @@ class OverlayPlacementTest {
         assertEquals(OverlayPosition(1080 - 389, 0), clamp(1080 - 389, 0)) // exact edges
         // A window larger than the screen pins to the top-left instead of failing.
         assertEquals(OverlayPosition(0, 0), OverlayPlacement.clamp(OverlayPosition(40, 40), 500, 300, 400))
-    }
-
-    @Test fun onlyAStoredPositionThatWasReclampedIsPersisted() {
-        val clamped = OverlayPosition(691, 0)
-        assertNull(OverlayPlacement.reclampedToPersist(stored = null, clamped = clamped)) // never store the default
-        assertNull(OverlayPlacement.reclampedToPersist(stored = clamped, clamped = clamped)) // unchanged
-        assertEquals(clamped, OverlayPlacement.reclampedToPersist(stored = OverlayPosition(1500, -3), clamped = clamped))
     }
 }

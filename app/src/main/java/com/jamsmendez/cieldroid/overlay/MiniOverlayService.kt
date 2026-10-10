@@ -51,7 +51,9 @@ class MiniOverlayService : Service() {
     private var interactive = true
     private var nextGeneration = 1L
     /** Re-entrancy safe: a release clears the slot first, so late or nested error callbacks are no-ops. */
-    private val slot = GenerationSlot<Generation> { gen ->
+    private val slot = GenerationSlot<Generation>(
+        onStartFailure = { id, error -> Log.e(TAG, "gen=$id start failed; releasing", error) },
+    ) { gen ->
         Log.i(TAG, "gen=${gen.id} released")
         gen.teardown.releaseAll()
     }
@@ -59,8 +61,11 @@ class MiniOverlayService : Service() {
     private var screenReceiver: BroadcastReceiver? = null
     private var repository: PreferencesSettingsRepository? = null
     private var moveMode = false
-    /** Current window top-left; null until restored from settings or the default is computed. */
-    private var position: OverlayPosition? = null
+    /**
+     * The user's anchor: the last position a real drag chose; null means the stored one (or the default).
+     * Clamping to the current screen is a display-only projection of it and is never persisted.
+     */
+    private var anchor: OverlayPosition? = null
 
     private class Window(val manager: WindowManager, val frame: OverlayFrame, val params: WindowManager.LayoutParams)
     private class Generation(val id: Long, val controller: PreviewController, val teardown: Teardown, val window: Window)
@@ -91,7 +96,13 @@ class MiniOverlayService : Service() {
                 interactive = intent.action == Intent.ACTION_SCREEN_ON
                 Log.i(TAG, "screen ${if (interactive) "on" else "off"} gen=${generation?.id}")
                 // The mini ignores the bridge pause; the controller's visibility callback runs WebView.onPause.
-                generation?.controller?.ownerResumed(interactive)
+                val current = generation ?: return
+                try {
+                    current.controller.ownerResumed(interactive)
+                } catch (e: Exception) {
+                    Log.e(TAG, "gen=${current.id} ownerResumed failed; releasing", e)
+                    slot.fail(current.id)
+                }
             }
         }
         val filter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply { addAction(Intent.ACTION_SCREEN_ON) }
@@ -135,14 +146,17 @@ class MiniOverlayService : Service() {
         val id = nextGeneration++
         slot.begin(id)
         val built = try {
-            buildGeneration(id, next).also { it.controller.ownerResumed(interactive) }
+            buildGeneration(id, next)
         } catch (e: Exception) {
             Log.e(TAG, "gen=$id creation failed; no overlay", e)
             slot.abort(id)
             return
         }
-        // A failure reported while building (e.g. a synchronous load error) releases it here instead.
-        if (!slot.install(id, built)) Log.w(TAG, "gen=$id failed while building; no overlay")
+        // Installed before it starts, so a throwing ownerResumed releases it. A failure reported while building
+        // (e.g. a synchronous load error) releases it here instead, never started.
+        if (!slot.activate(id, built) { it.controller.ownerResumed(interactive) }) {
+            Log.w(TAG, "gen=$id failed while building or starting; no overlay")
+        }
     }
 
     /** Builds every part under one release stack, released in reverse order (window removed before destroy). */
@@ -176,13 +190,11 @@ class MiniOverlayService : Service() {
             // The scene keeps its full side; the smaller window crops its transparent border around the ring.
             val frame = OverlayFrame(windowContext)
             frame.addView(created.view, FrameLayout.LayoutParams(size.webSide, size.webSide, Gravity.CENTER))
-            val stored = storedPosition()
+            // Display-only projection of the anchor; nothing is persisted here.
             val start = OverlayPlacement.clamp(
-                position ?: stored ?: defaultPosition(windowManager, size.windowSide),
+                anchor ?: storedPosition() ?: defaultPosition(windowManager, size.windowSide),
                 size.windowSide, bounds.width(), bounds.height(),
             )
-            position = start
-            OverlayPlacement.reclampedToPersist(stored, start)?.let(::persistPosition)
             val params = WindowManager.LayoutParams(
                 size.windowSide, size.windowSide, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 windowFlags(moveMode), PixelFormat.TRANSLUCENT,
@@ -244,14 +256,16 @@ class MiniOverlayService : Service() {
             drag.move(rawX, rawY, window.params.width, bounds.width(), bounds.height())?.let { next ->
                 window.params.x = next.x
                 window.params.y = next.y
-                position = next
                 updateLayout(window)
             }
         }
         window.frame.onEnd = {
             val end = drag.end()
             if (end.dragged) Log.i(TAG, "drag ended persist=${end.persist}") else Log.i(TAG, "tap; nothing persisted")
-            end.persist?.let(::persistPosition)
+            end.persist?.let {
+                anchor = it
+                persistPosition(it)
+            }
             end.dragged
         }
     }
@@ -267,20 +281,23 @@ class MiniOverlayService : Service() {
         }
     }
 
-    /** Rotation or a display change: keep the whole window on the new screen. */
+    /**
+     * Rotation or a display change: re-project the anchor (or the default recomputed for the new width) onto
+     * the new screen. Display-only and never persisted, so landscape then portrait restores the original spot.
+     */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         val window = generation?.window ?: return
         val bounds = window.manager.currentWindowMetrics.bounds
-        val current = OverlayPosition(window.params.x, window.params.y)
-        val clamped = OverlayPlacement.clamp(current, window.params.width, bounds.width(), bounds.height())
-        if (clamped == current) return
-        window.params.x = clamped.x
-        window.params.y = clamped.y
-        position = clamped
+        val target = OverlayPlacement.clamp(
+            anchor ?: storedPosition() ?: defaultPosition(window.manager, window.params.width),
+            window.params.width, bounds.width(), bounds.height(),
+        )
+        if (target == OverlayPosition(window.params.x, window.params.y)) return
+        window.params.x = target.x
+        window.params.y = target.y
         updateLayout(window)
-        Log.i(TAG, "re-clamped overlay to $clamped for ${bounds.width()}x${bounds.height()}")
-        OverlayPlacement.reclampedToPersist(storedPosition(), clamped)?.let(::persistPosition)
+        Log.i(TAG, "re-projected overlay to $target for ${bounds.width()}x${bounds.height()}")
     }
 
     override fun onDestroy() {

@@ -39,11 +39,4 @@ object OverlayPlacement {
             position.x.coerceIn(0, (screenWidth - windowSide).coerceAtLeast(0)),
             position.y.coerceIn(0, (screenHeight - windowSide).coerceAtLeast(0)),
         )
-
-    /**
-     * The position to store after a re-clamp (e.g. the screen size changed): only a stored position that the
-     * clamp actually changed. A default (never stored) position is never persisted.
-     */
-    fun reclampedToPersist(stored: OverlayPosition?, clamped: OverlayPosition): OverlayPosition? =
-        if (stored != null && stored != clamped) clamped else null
 }

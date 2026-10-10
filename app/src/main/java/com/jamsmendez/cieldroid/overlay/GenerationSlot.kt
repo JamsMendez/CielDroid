@@ -1,12 +1,18 @@
 package com.jamsmendez.cieldroid.overlay
 
+import kotlin.coroutines.cancellation.CancellationException
+
 /**
  * Holds the overlay's single live generation and makes its release re-entrancy safe. The slot is cleared
  * before [release] runs, so an error callback or a second release arriving during (or after) a release is a
  * no-op. A failure reported while generation [begin]..[install] is still being built is remembered and the
- * generation is released as soon as it is installed. Main-thread owned; [release] must not throw.
+ * generation is released as soon as it is installed. [activate] also releases a generation whose start throws,
+ * reporting it to [onStartFailure] first. Main-thread owned; [release] must not throw.
  */
-class GenerationSlot<T : Any>(private val release: (T) -> Unit) {
+class GenerationSlot<T : Any>(
+    private val onStartFailure: (Long, Exception) -> Unit = { _, _ -> },
+    private val release: (T) -> Unit,
+) {
     private var currentEntry: Pair<Long, T>? = null
     private var building: Long? = null
     private var buildFailed = false
@@ -31,6 +37,25 @@ class GenerationSlot<T : Any>(private val release: (T) -> Unit) {
         endBuild()
         currentEntry = id to value
         return true
+    }
+
+    /**
+     * [install]s the built generation, then runs [start] on it only if it was installed. If [start] throws, the
+     * installed generation is released at once (never leaked) and false is returned; cancellation propagates.
+     */
+    fun activate(id: Long, value: T, start: (T) -> Unit): Boolean {
+        if (!install(id, value)) return false
+        try {
+            start(value)
+        } catch (cancelled: CancellationException) {
+            fail(id)
+            throw cancelled
+        } catch (e: Exception) {
+            onStartFailure(id, e)
+            fail(id)
+            return false
+        }
+        return currentId == id
     }
 
     /** The build of [id] threw; its own teardown already released what it registered. */
