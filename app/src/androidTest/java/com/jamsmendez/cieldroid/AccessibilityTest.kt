@@ -46,7 +46,7 @@ class AccessibilityTest {
         launched()
         val heading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
         listOf(R.string.app_name, R.string.preview_title, R.string.scene_label, R.string.wallpaper_title,
-            R.string.future_modes)
+            R.string.overlay_title, R.string.future_modes)
             .forEach { compose.onNode(hasText(string(it)) and heading).assertExists() }
     }
 

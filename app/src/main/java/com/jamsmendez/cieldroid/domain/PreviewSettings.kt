@@ -10,6 +10,8 @@ enum class PreviewFps(val value: Int) {
 data class PreviewSettings(
     val scene: SceneId = SceneId.PROCESSING,
     val fps: PreviewFps = PreviewFps.THIRTY,
+    /** Never persisted: preview and wallpaper stay FULL; only the overlay requests MINI. */
+    val variant: SceneVariant = SceneVariant.FULL,
 ) {
     companion object {
         /** The W01 spike's measured Canvas2D scene; WebGL scenes stay opt-in for the wallpaper. */

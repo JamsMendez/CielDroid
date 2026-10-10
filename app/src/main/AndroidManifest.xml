@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- O01 overlay prototype, authorized by the user; granted manually in system settings. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -29,6 +32,9 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/scene_wallpaper" />
         </service>
+        <service
+            android:name=".overlay.MiniOverlayService"
+            android:exported="false" />
     </application>
 
 </manifest>

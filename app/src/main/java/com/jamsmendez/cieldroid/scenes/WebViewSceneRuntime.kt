@@ -3,6 +3,7 @@ package com.jamsmendez.cieldroid.scenes
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -20,6 +21,8 @@ class WebViewSceneRuntime(
     private val generation: Long,
     private val settings: PreviewSettings,
     private val emit: (Long, SceneEvent) -> Unit,
+    /** Overlay only: the WebView composites true alpha instead of its default opaque white. */
+    private val transparentBackground: Boolean = false,
 ) {
     private val released = AtomicBoolean(false)
     private val handler = Handler(Looper.getMainLooper())
@@ -28,11 +31,11 @@ class WebViewSceneRuntime(
         .setDomain("appassets.androidplatform.net")
         .addPathHandler("/assets/") { path ->
             // The caller's policy is primary; repeat the inventory check at the IO boundary.
-            if (path !in SceneAssets.paths) denied()
+            if (path !in SceneAdaptations.served) denied()
             else try {
                 val bytes = context.applicationContext.assets.open(path).use { it.readBytes() }
                 val body = if (path.endsWith("/index.html")) {
-                    SceneHtml.serve(bytes.toString(Charsets.UTF_8)).toByteArray(Charsets.UTF_8)
+                    SceneHtml.serve(bytes.toString(Charsets.UTF_8), settings.variant).toByteArray(Charsets.UTF_8)
                 } else bytes
                 val mime = when (path.substringAfterLast('.')) {
                     "html" -> "text/html"
@@ -62,6 +65,7 @@ class WebViewSceneRuntime(
             cacheMode = WebSettings.LOAD_NO_CACHE
             setGeolocationEnabled(false)
         }
+        if (transparentBackground) view.setBackgroundColor(Color.TRANSPARENT) // Before any load.
         view.setDownloadListener { _, _, _, _, _ -> /* No downloads. */ }
         view.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse {

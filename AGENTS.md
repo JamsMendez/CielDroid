@@ -136,6 +136,15 @@ content descriptions, so text-based preview tests stay unambiguous. "Set as wall
 `onSurfaceCreated` (the holder reuses one `Surface` object, so identity never changed). Limits:
 fps 12.6/30 measured once for idle; energy, landscape, processing/60 unmeasured; single device.
 
+O01 (user-authorized `SYSTEM_ALERT_WINDOW`, granted manually by the user; never via appops/pm):
+`SceneVariant` (FULL default, never persisted); `ScenePolicy` entry queries are exactly `fps=30|60`
+or `fps=30|60&variant=mini`. `assets/adaptations/mini-transparent.css` is a separate non-original
+adaptation (`SceneAdaptations`, outside the 56-original `SceneAssets` inventory and the verifier's
+`scenes/` scan); `SceneHtml` links it only for MINI. `overlay/MiniOverlayService` is a plain started
+service (no foreground service) owning one touch-through `TYPE_APPLICATION_OVERLAY` window with a
+transparent WebView generation (wallpaper scene/FPS, MINI), paused on screen off. `MiniTransparencyTest`
+proves alpha off-screen only; the overlay window itself is unverified until the user grants the permission.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

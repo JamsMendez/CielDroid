@@ -190,6 +190,14 @@ recreated wallpaper surface is now detected from `onSurfaceCreated`, because the
 `Surface` object. Honest limits: one measurement of the idle scene showed about 12.6 of 30 fps;
 energy, landscape and processing at 60 fps are unmeasured; single device (moto g84).
 
+O01 adds a "Floating mini scene" prototype with your authorization for "Display over other apps"
+(`SYSTEM_ALERT_WINDOW`). You grant it yourself: "Grant overlay permission" opens the system screen.
+Once granted, "Start mini scene" shows the mini ring of the wallpaper scene/FPS in a small square at
+the top end of the screen; touches pass through it, and it pauses while the screen is off. Transparency
+comes from a separate adaptation stylesheet (`assets/adaptations/mini-transparent.css`); the 56
+originals are unchanged. Limits: plain service without a foreground notification (the system may stop
+it); dark ring bases look stronger than the Linux luminance key; fps and energy unmeasured; one device.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

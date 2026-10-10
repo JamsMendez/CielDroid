@@ -18,7 +18,7 @@
     <string name="scene_viewport_description">Animated %1$s scene preview at %2$d FPS</string>
     <string name="preview_instance">Preview instance: %1$d</string>
     <string name="future_modes">Future modes unavailable</string>
-    <string name="future_modes_explanation">Overlay and widget are not implemented. The live wallpaper above is an available prototype, not a validated mode.</string>
+    <string name="future_modes_explanation">The widget is not implemented. The live wallpaper and floating mini scene above are available prototypes, not validated modes.</string>
     <string name="wallpaper_description">Prototype: the original scene chosen in CielDroid. Frame rate and battery use are not yet optimized.</string>
     <string name="wallpaper_title">Live wallpaper</string>
     <string name="wallpaper_section_description">Prototype: choose the scene and frame rate for the live wallpaper, independent of the preview above. Frame rate and battery use are not yet optimized.</string>
@@ -27,4 +27,11 @@
     <string name="wallpaper_set">Set as wallpaper</string>
     <string name="wallpaper_set_hint">Opens the system wallpaper preview. You confirm it there; CielDroid never applies it.</string>
     <string name="wallpaper_picker_unavailable">The system live wallpaper picker is unavailable on this device.</string>
+    <string name="overlay_title">Floating mini scene</string>
+    <string name="overlay_description">Prototype: shows the mini ring of the wallpaper scene and frame rate above other apps. Touches pass through it. Frame rate and battery use are not yet measured.</string>
+    <string name="overlay_permission_missing">Requires the \"Display over other apps\" permission, which you grant in system settings.</string>
+    <string name="overlay_grant">Grant overlay permission</string>
+    <string name="overlay_start">Start mini scene</string>
+    <string name="overlay_stop">Stop mini scene</string>
+    <string name="overlay_settings_unavailable">The overlay permission settings screen is unavailable on this device.</string>
 </resources>

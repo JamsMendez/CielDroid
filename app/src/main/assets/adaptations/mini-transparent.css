@@ -1,0 +1,4 @@
+/* CielDroid adaptation, not an original: the overlay composites true alpha instead of the Linux luma key. */
+html.scene-mini {
+  background: transparent !important;
+}
