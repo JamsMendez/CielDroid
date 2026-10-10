@@ -10,7 +10,7 @@ and widget behavior remain out of scope.
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
 and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs the intended complete 56-file / 940651-byte set, not the C06b subset.
+catalogs the intended complete 56-file / 940651-byte set, not the C07 subset.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
 these files; Full is the default and `?variant=mini` selects Mini. The canvas
@@ -23,16 +23,22 @@ to C06a's six model/effects JS files. Full/Mini share these files, not a Mini-on
 canvas: Full is default; query or hash `variant=mini` selects Mini; `fps=30`
 selects 30 fps, otherwise 60. Static closure covers ten JS files, CSS and existing
 shared overlay/font, with no observed idle dependency; it is not dynamic proof.
-The candidate is 26 originals / 533806 bytes (25 text, one TTF);
-30 processing/raphael files / 406845 bytes remain out. Entry/driver closure is
-complete, but JS is not executed; Android runtime integration awaits C13.
+C07 adds the whole original processing Full/Mini component under
+`app/src/main/assets/scenes/processing/`: 12 text files / 153772 bytes / 3402 lines.
+Full is default; query or hash `variant=mini` selects Mini in the same files;
+query `fps=30` selects 30 fps, otherwise 60. The “Processing mini” canvas label
+is not a Mini-only import. Static closure covers ten JS files, CSS and the shared
+overlay/font; it is not execution, GPU proof or Android compatibility.
+The C07 candidate is 38 originals / 687578 bytes (37 text, one TTF);
+18 raphael files / 253073 bytes remain out. Android runtime integration awaits C13.
 The launcher remains catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
 these natural components, not native-code budgets or public JavaScript licensing.
-Original qrc-only CSPs (`idle/index.html:5`, `explorer/index.html:5`) remain; import does not
-establish Android rendering compatibility. Idle's static references cover all nine JS
-files, CSS, shared alert overlay and Archivo Black/OFL; this bounded dependency
+Original qrc-only CSPs remain at `idle/index.html:5`, `explorer/index.html:5`
+and `processing/index.html:5`; import does not establish Android rendering
+compatibility. Idle's static references cover all nine JS files, CSS, shared alert
+overlay and Archivo Black/OFL; this bounded dependency
 closure is not dynamic runtime proof.
 
 ## Build and verification
@@ -75,10 +81,29 @@ unverified; no source/staging mutation was observed. That check reran no builds.
 Historical C06a: four isolated checks passed: eight fresh host tests (seven functional),
 no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
 20 originals against committed upstream, catalog and APK; source/index unchanged.
-Shared Git object mtimes changed later without byte changes; writer is unproven.
-C06b's four isolated checks passed: eight fresh host tests (seven functional),
+Later, 117 common Git objects had mtime-only changes with equal SHA/size;
+the writer is unknown. This is not a globally immutable metadata history.
+Historical C06b: four isolated checks passed: eight fresh host tests (seven functional),
 no failures/errors/skips; lint 0 errors/34 warnings. Separate checks match all
 26 originals against committed upstream, catalog and APK; source/index unchanged.
+C07: four separate offline wrapper checks exited 0: assemble 36 tasks executed,
+forced host tests 24, lint 9 executed/18 up-to-date, test APK 30 executed/20 up-to-date.
+Eight fresh host tests (seven functional) had no failures/errors/skips;
+lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Separate byte checks match all 38 originals / 687578 bytes against the catalog,
+committed upstream and production APK; test APK assets: zero. Host tests are not
+asset coverage. Production/test manifest boundaries were attested: production
+min35/target37, sole MainActivity launcher, no services or Internet/overlay/wallpaper
+permissions; AndroidX app-local signature permission/provider/receiver remain.
+The separate test manifest uses AndroidJUnitRunner and REORDER_TASKS.
+Four actual JDK 25 daemon requests were attested, distinct from the JDK 26 launcher.
+Test APK compilation is not device execution; preDebugAndroidTestBuild SKIPPED
+and NO-SOURCE tasks are not JUnit skips. The strict final metadata audit exited 1:
+only the common `.git` root directory had mtime-only drift; writer unknown.
+All 88 candidate source/index entries, HEAD, 14-path staged status and pure tree
+were unchanged, as were metadata-file bytes/size/mtime/mode and linked metadata.
+A transient lock is only a possible mechanism, not proven causality. Human accepted
+qualified I02 continuation; passing checks stand, native review/local commit pending.
 Component import alone proves neither Full visual behavior nor GPU compatibility.
 `tools/verify_scene_assets.py` requires all 56 assets and first applies at C09.
 Final UI documentation restoration belongs to C13/C14, not this slice.
