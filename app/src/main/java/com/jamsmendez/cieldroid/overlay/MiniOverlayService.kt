@@ -140,7 +140,8 @@ class MiniOverlayService : Service() {
                     }
             }
             val bounds = windowManager.currentWindowMetrics.bounds
-            val side = (minOf(bounds.width(), bounds.height()) * 0.6f).toInt()
+            // 0.45 of the short side: 25% smaller than the first prototype after on-device review.
+            val side = (minOf(bounds.width(), bounds.height()) * 0.45f).toInt()
             val margin = (16 * resources.displayMetrics.density).toInt()
             val params = WindowManager.LayoutParams(
                 side, side, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
