@@ -190,6 +190,14 @@ recreated wallpaper surface is now detected from `onSurfaceCreated`, because the
 `Surface` object. Honest limits: one measurement of the idle scene showed about 12.6 of 30 fps;
 energy, landscape and processing at 60 fps are unmeasured; single device (moto g84).
 
+W05 adds a home screen snapshot widget (`widget/SceneWidgetProvider`). It shows one still frame of
+the live wallpaper scene/FPS, rendered off-screen by `SceneSnapshotRenderer` (ImageReader → private
+`CielSnapshot` VirtualDisplay → Presentation → its own WebView), released in reverse order on every
+path. It refreshes only when a widget is added or resized and when the wallpaper scene/FPS changes;
+there are no periodic updates and it is not animated by design. The PNG (≤ 512 px, one per scene+fps)
+is cached in app-internal `filesDir`. On timeout (≤ 8 s) or scene error it shows the app icon and
+scene name; a tap opens CielDroid. You add the widget yourself from the launcher; single device.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

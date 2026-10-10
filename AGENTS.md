@@ -136,6 +136,14 @@ content descriptions, so text-based preview tests stay unambiguous. "Set as wall
 `onSurfaceCreated` (the holder reuses one `Surface` object, so identity never changed). Limits:
 fps 12.6/30 measured once for idle; energy, landscape, processing/60 unmeasured; single device.
 
+W05: `widget/SceneWidgetProvider` (receiver + `scene_widget_info.xml`, `updatePeriodMillis=0`) shows a
+still snapshot of the WALLPAPER settings from `widget/SceneSnapshotRenderer` (ImageReader, private
+`CielSnapshot-<id>` VirtualDisplay, Presentation, own controller/WebView, `Teardown` release on all
+paths, null on timeout/ERROR). Refresh only on add/resize and on wallpaper scene/FPS writes
+(`PreviewViewModel` → `requestUpdate`); goAsync with an 8 s bound. PNG cache is app-internal
+`filesDir` keyed by scene+fps; fallback is icon + scene name. Pure helpers live in `SnapshotMath`.
+Tests never place widgets; the user adds one manually. Not animated by design; single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

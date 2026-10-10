@@ -9,13 +9,18 @@ import com.jamsmendez.cieldroid.data.SettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.SceneId
+import com.jamsmendez.cieldroid.widget.SceneWidgetProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository) : ViewModel() {
+/** [onWallpaperChanged] runs after a successful wallpaper write, e.g. to refresh placed widgets. */
+class PreviewViewModel(
+    createRepository: (CoroutineScope) -> SettingsRepository,
+    private val onWallpaperChanged: () -> Unit = {},
+) : ViewModel() {
     constructor(repository: SettingsRepository) : this({ repository })
     private val repository = createRepository(viewModelScope)
     val settings = repository.state
@@ -26,15 +31,18 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
 
     fun selectScene(scene: SceneId) = write(PREVIEW_ERROR) { repository.setScene(scene) }
     fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
-    fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
-    fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
+    fun selectWallpaperScene(scene: SceneId) =
+        write(WALLPAPER_ERROR, onWallpaperChanged) { repository.setWallpaperScene(scene) }
+    fun selectWallpaperFps(fps: PreviewFps) =
+        write(WALLPAPER_ERROR, onWallpaperChanged) { repository.setWallpaperFps(fps) }
 
-    private fun write(errorMessage: String, update: suspend () -> Unit) {
+    private fun write(errorMessage: String, onSuccess: () -> Unit = {}, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
         viewModelScope.launch {
             try {
                 update()
                 mutableWriteError.value = null
+                onSuccess()
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { mutableWriteError.value = errorMessage }
         }
@@ -50,7 +58,10 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     require(modelClass == PreviewViewModel::class.java)
-                    return PreviewViewModel { scope -> PreferencesSettingsRepository(app.settingsPreferences, scope) } as T
+                    return PreviewViewModel(
+                        { scope -> PreferencesSettingsRepository(app.settingsPreferences, scope) },
+                        { SceneWidgetProvider.requestUpdate(app) },
+                    ) as T
                 }
             }
         }

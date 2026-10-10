@@ -29,6 +29,16 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/scene_wallpaper" />
         </service>
+        <receiver
+            android:name=".widget.SceneWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/scene_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
