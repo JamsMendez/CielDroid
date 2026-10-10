@@ -50,8 +50,17 @@ class OverlaySectionTest {
     private fun description(node: SemanticsNodeInteraction) =
         node.fetchSemanticsNode().config[SemanticsProperties.ContentDescription].single()
 
+    private fun openSelector() {
+        compose.onNodeWithTag("overlay-content").performScrollTo().performClick()
+        compose.waitUntil(20_000) { compose.onAllNodesWithTag("overlay-selector").fetchSemanticsNodes().isNotEmpty() }
+    }
+
     @Test fun chipsExposeTagsDescriptionsAndSelection() {
         show(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), enabled = true)
+        // Collapsed: one summary row with the friendly name; the options are not composed yet.
+        compose.onNodeWithTag("overlay-content").performScrollTo().assert(hasText("Scene: Explorer · 60 FPS"))
+        compose.onNodeWithTag("overlay-scene-explorer").assertDoesNotExist()
+        openSelector()
         SceneId.entries.forEach { scene ->
             val chip = compose.onNodeWithTag("overlay-scene-${scene.assetId}").performScrollTo()
             assertEquals("Overlay scene ${scene.assetId}", description(chip))
@@ -63,14 +72,18 @@ class OverlaySectionTest {
             assertEquals("Overlay ${fps.value} FPS", description(chip))
             if (fps == PreviewFps.SIXTY) chip.assertIsSelected() else chip.assertIsNotSelected()
         }
-        // Visible chip text is cleared from semantics, so the labels never collide with the preview chips.
+        // Visible option text is cleared from semantics, so the labels never collide with the preview chips.
+        compose.onAllNodesWithText("Explorer").assertCountEquals(0)
         compose.onAllNodesWithText("explorer").assertCountEquals(0)
+        compose.onNodeWithTag("overlay-selector-done").performClick()
+        compose.onNodeWithTag("overlay-selector").assertDoesNotExist()
         compose.onNodeWithTag("overlay-start").assertExists()
         compose.onNodeWithTag("overlay-move-mode").assertExists()
     }
 
     @Test fun chipsReportSelectionsThroughCallbacks() {
         show(PreviewSettings.OVERLAY_DEFAULT, enabled = true)
+        openSelector()
         compose.onNodeWithTag("overlay-scene-raphael").performScrollTo().performClick()
         compose.onNodeWithTag("overlay-fps-60").performScrollTo().performClick()
         compose.runOnIdle {
@@ -79,11 +92,13 @@ class OverlaySectionTest {
         }
     }
 
-    @Test fun disabledChipsShowNoSelectionAndIgnoreClicks() {
+    @Test fun disabledSummaryShowsNoSelectionAndOpensNoSelector() {
         show(PreviewSettings.OVERLAY_DEFAULT, enabled = false)
-        compose.onNodeWithTag("overlay-scene-idle").performScrollTo().assertIsNotEnabled().assertIsNotSelected()
-        compose.onNodeWithTag("overlay-fps-30").performScrollTo().assertIsNotEnabled().assertIsNotSelected()
-        compose.onNodeWithTag("overlay-scene-raphael").performScrollTo().performClick()
+        compose.onNodeWithTag("overlay-content").performScrollTo().assertIsNotEnabled()
+            .assert(!hasText("Scene: ", substring = true))
+        compose.onNodeWithTag("overlay-content").performClick()
+        compose.onNodeWithTag("overlay-selector").assertDoesNotExist()
+        compose.onNodeWithTag("overlay-scene-raphael").assertDoesNotExist()
         compose.runOnIdle { assertEquals(emptyList<SceneId>(), scenes.toList()) }
     }
 }

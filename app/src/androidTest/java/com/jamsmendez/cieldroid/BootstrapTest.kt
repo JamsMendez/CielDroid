@@ -12,13 +12,27 @@ import org.junit.runner.RunWith
 class BootstrapTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
-    @Test fun launcherShowsTruthfulPreviewAndFutureModeStatus() {
+    @Test fun launcherShowsEndUserSectionsWithFriendlySceneNames() {
         compose.onNodeWithText("CielDroid").assertIsDisplayed()
-        compose.onNodeWithText("Original FULL scene preview").assertIsDisplayed()
-        compose.onNodeWithText("Device validation pending. Readiness is not proof of visual fidelity.").assertIsDisplayed()
-        listOf("processing", "explorer", "idle", "raphael", "30 FPS", "60 FPS", "Live wallpaper", "Set as wallpaper",
-            "Floating mini scene", "Future modes unavailable").forEach {
+        listOf("Preview", "Processing", "Explorer", "Idle", "Raphael", "30 FPS", "60 FPS", "Pause", "Retry",
+            "Live wallpaper", "Set as wallpaper", "Floating mini scene").forEach {
             compose.onNodeWithText(it).performScrollTo().assertIsDisplayed()
         }
+        // Wallpaper and overlay show one compact summary row each instead of their own chip sets.
+        listOf("wallpaper-content", "overlay-content").forEach {
+            compose.onNodeWithTag(it).performScrollTo().assertIsDisplayed().assertHasClickAction()
+        }
+    }
+
+    @Test fun launcherHidesDeveloperTextAndRawSceneIds() {
+        compose.waitUntil(20_000) { compose.onAllNodesWithTag("preview-status").fetchSemanticsNodes().isNotEmpty() }
+        listOf("Original FULL scene preview", "Device validation pending", "visual validation pending",
+            "Preview instance", "Future modes", "Prototype", "not validated").forEach {
+            compose.onAllNodesWithText(it, substring = true, ignoreCase = true).assertCountEquals(0)
+        }
+        listOf("processing", "explorer", "idle", "raphael").forEach {
+            compose.onAllNodesWithText(it).assertCountEquals(0)
+        }
+        compose.onAllNodesWithTag("preview-generation").assertCountEquals(0)
     }
 }

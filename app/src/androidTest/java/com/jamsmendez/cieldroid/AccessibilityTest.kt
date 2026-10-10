@@ -46,8 +46,7 @@ class AccessibilityTest {
     @Test fun sectionTitlesAreHeadings() {
         launched()
         val heading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
-        listOf(R.string.app_name, R.string.preview_title, R.string.scene_label, R.string.wallpaper_title,
-            R.string.overlay_title, R.string.future_modes)
+        listOf(R.string.app_name, R.string.preview_title, R.string.wallpaper_title, R.string.overlay_title)
             .forEach { compose.onNode(hasText(string(it)) and heading).assertExists() }
     }
 
@@ -64,12 +63,16 @@ class AccessibilityTest {
     @Test fun sceneChipsShareOneSelectableGroup() {
         launched()
         val group = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
-        listOf("processing", "explorer", "idle", "raphael")
+        listOf("Processing", "Explorer", "Idle", "Raphael", "30 FPS", "60 FPS")
             .forEach { compose.onNode(hasText(it) and group).assertExists() }
     }
 
     @Test fun wallpaperChipsAreGroupedAndDescribedApartFromPreviewChips() {
         launched()
+        // The options live in a selector opened from the compact summary row.
+        compose.onNodeWithTag("wallpaper-scene-idle").assertDoesNotExist()
+        compose.onNodeWithTag("wallpaper-content").performScrollTo()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)).performClick()
         val group = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
         listOf("processing", "explorer", "idle", "raphael").forEach {
             compose.onNode(hasTestTag("wallpaper-scene-$it") and group)
@@ -89,10 +92,10 @@ class AccessibilityTest {
 
     @Test fun viewportDescribesSceneAndStateWhileWebContentIsHidden() {
         launched()
-        select("processing")
+        select("Processing")
         select("30 FPS")
         compose.onNodeWithTag("scene-viewport").performScrollTo()
-            .assertContentDescriptionEquals(string(R.string.scene_viewport_description, "processing", 30))
+            .assertContentDescriptionEquals(string(R.string.scene_viewport_description, "Processing", 30))
             .assert(SemanticsMatcher.expectValue(
                 SemanticsProperties.StateDescription, string(R.string.scene_state_running)))
         assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS, webView().importantForAccessibility)

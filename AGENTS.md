@@ -154,6 +154,16 @@ wallpaper) in `OverlaySettings.content`; `OverlaySection` chips `overlay-scene-<
 W04b ("Overlay scene <id>" / "Overlay <n> FPS"). The service follows them (always MINI) and rebuilds only on
 scene/FPS change, not move mode or position; wallpaper keys no longer affect it. `OverlaySectionTest` is compiled only.
 
+R-redesign (R01–R03): fixed dark processing palette (`ui/theme/Color.kt`, no `values-night`), Ciel logo
+(`drawable-nodpi/ciel_logo.png`, non-original, outside the 56 originals) as adaptive icon and header mark.
+Headings: app name, Preview, Live wallpaper, Floating mini scene. Only the preview shows visible scene/FPS
+chips, with friendly names (`sceneLabel`); asset ids stay internal. Wallpaper/overlay show one clickable
+`wallpaper-content`/`overlay-content` row ("Scene: <Name> · <n> FPS", "Not available yet" while disabled)
+that opens an `AlertDialog` (`<prefix>-selector`, `<prefix>-selector-done`) holding the unchanged option tags
+and descriptions. `preview-status` reads Loading/Running/Paused/error (Running = READY and resumed); the
+generation is test-only semantics (`PreviewGenerationKey`), never text. Removed: validation_pending,
+preview instance, scene_ready, Prototype copy and Future modes.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

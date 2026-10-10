@@ -46,42 +46,42 @@ fun CielDroidApp() {
     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         Column(
             Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)
-                .verticalScroll(rememberScrollState()).padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             AppHeader()
-            Text(stringResource(R.string.preview_title), style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() })
-            Text(stringResource(R.string.validation_pending))
             if (!settings.loaded) Text(stringResource(if (settings.error == null)
                 R.string.settings_loading else R.string.settings_read_error))
             writeError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Text(stringResource(R.string.scene_label), style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() })
-            Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                SceneId.entries.forEach { scene ->
-                    FilterChip(
-                        selected = enabled && settings.settings.scene == scene,
-                        onClick = { vm.selectScene(scene) }, enabled = enabled,
-                        label = { Text(scene.assetId) }, modifier = Modifier.fillMaxWidth(),
-                    )
+            SectionCard(R.string.preview_title) {
+                if (enabled) key(generation) {
+                    ScenePreview(settings.settings, generation, manuallyPaused)
                 }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PreviewFps.entries.forEach { fps ->
-                    FilterChip(selected = enabled && settings.settings.fps == fps,
-                        onClick = { vm.selectFps(fps) }, enabled = enabled,
-                        label = { Text(stringResource(R.string.fps_label, fps.value)) })
+                FlowRow(
+                    Modifier.selectableGroup(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    SceneId.entries.forEach { scene ->
+                        FilterChip(
+                            selected = enabled && settings.settings.scene == scene,
+                            onClick = { vm.selectScene(scene) }, enabled = enabled,
+                            label = { Text(stringResource(sceneLabel(scene))) },
+                        )
+                    }
                 }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { manuallyPaused = !manuallyPaused }, enabled = enabled) {
-                    Text(stringResource(if (manuallyPaused) R.string.resume else R.string.pause))
+                Row(Modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PreviewFps.entries.forEach { fps ->
+                        FilterChip(selected = enabled && settings.settings.fps == fps,
+                            onClick = { vm.selectFps(fps) }, enabled = enabled,
+                            label = { Text(stringResource(R.string.fps_label, fps.value)) })
+                    }
                 }
-                OutlinedButton(onClick = { retry++ }, enabled = enabled) { Text(stringResource(R.string.retry)) }
-            }
-            if (enabled) key(generation) {
-                ScenePreview(settings.settings, generation, manuallyPaused)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(onClick = { manuallyPaused = !manuallyPaused }, enabled = enabled) {
+                        Text(stringResource(if (manuallyPaused) R.string.resume else R.string.pause))
+                    }
+                    OutlinedButton(onClick = { retry++ }, enabled = enabled) { Text(stringResource(R.string.retry)) }
+                }
             }
             WallpaperSection(
                 wallpaper = settings.wallpaper, enabled = enabled, pickerUnavailable = pickerUnavailable,
@@ -98,9 +98,6 @@ fun CielDroidApp() {
                 onStart = { if (context.canDrawOverlays()) context.startMiniOverlay() else overlayGranted = false },
                 onStop = { context.stopMiniOverlay() },
             )
-            Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() })
-            Text(stringResource(R.string.future_modes_explanation))
         }
     }
 }
@@ -109,8 +106,12 @@ fun CielDroidApp() {
 @Composable
 private fun AppHeader() {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Image(painterResource(R.drawable.ciel_logo), contentDescription = null, modifier = Modifier.size(48.dp))
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.semantics { heading() })
+        Image(painterResource(R.drawable.ciel_logo), contentDescription = null, modifier = Modifier.size(56.dp))
+        Column {
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.semantics { heading() })
+            Text(stringResource(R.string.app_tagline), style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }

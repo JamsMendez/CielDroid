@@ -218,6 +218,12 @@ is outside the 56-original `SceneAssets` inventory and the verifier's `scenes/` 
 adaptive launcher icon foreground and monochrome layer (20% inset, inside the safe zone, on the
 `#01040A` scene background) and the decorative header mark; the template robot icons are removed.
 
+R03 launcher: the preview card keeps the only visible scene/FPS chips, with friendly names (Processing,
+Explorer, Idle, Raphael). Live wallpaper and the floating mini scene each show one "Scene: <Name> · <n> FPS"
+row; tapping it opens a selector that writes their own keys. The status line reads Loading, Running,
+Paused or an error; developer text and the "Future modes" section are gone. Instrumentation on the moto g84
+(API 35): `am instrument` OK, 19 tests.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
