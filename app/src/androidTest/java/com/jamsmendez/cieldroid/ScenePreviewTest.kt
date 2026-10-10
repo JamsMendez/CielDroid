@@ -6,6 +6,7 @@ import android.webkit.WebView
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.jamsmendez.cieldroid.ui.PreviewGenerationKey
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Rule
@@ -17,15 +18,16 @@ import org.junit.runner.RunWith
 class ScenePreviewTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    // The status reads "Running" only once the running session reached both readiness markers.
     private fun ready() {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("preview-status").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("scene-viewport").performScrollTo()
         compose.waitUntil(20_000) {
-            compose.onAllNodes(hasText("Draw and bridge ready — visual validation pending")).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodes(hasTestTag("preview-status") and hasText("Running")).fetchSemanticsNodes().isNotEmpty()
         }
     }
-    private fun instance() = compose.onNodeWithTag("preview-generation").fetchSemanticsNode()
-        .config[androidx.compose.ui.semantics.SemanticsProperties.Text].joinToString { it.text }
+    // Test-only semantics: the generation is never visible text.
+    private fun instance() = compose.onNodeWithTag("scene-viewport").fetchSemanticsNode().config[PreviewGenerationKey]
 
     private fun webView(): WebView {
         fun descendants(view: View): List<WebView> = when (view) {
@@ -49,7 +51,7 @@ class ScenePreviewTest {
 
     @Test fun fourOriginalScenesReachBothReadinessMarkersAtBothRates() {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("preview-status").fetchSemanticsNodes().isNotEmpty() }
-        listOf("processing", "explorer", "idle", "raphael").forEach { scene ->
+        listOf("Processing", "Explorer", "Idle", "Raphael").forEach { scene ->
             listOf("30 FPS", "60 FPS").forEach { fps ->
                 select(scene)
                 select(fps)
@@ -62,13 +64,14 @@ class ScenePreviewTest {
 
     @Test fun retryReplacesOwnerAndRecreationRetainsPersistedSettings() {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("preview-status").fetchSemanticsNodes().isNotEmpty() }
-        select("idle")
+        select("Idle")
         select("60 FPS")
         ready()
         val before = instance()
         val originalView = webView()
         compose.onNodeWithText("Pause").performScrollTo().performClick()
         compose.onNodeWithText("Resume").assertIsDisplayed()
+        compose.onNode(hasTestTag("preview-status") and hasText("Paused")).assertExists()
         compose.onNodeWithText("Retry").performClick()
         compose.onNodeWithText("Resume").assertIsDisplayed()
         assertNotEquals(before, instance()) // Same ViewModel: retry allocates a fresh generation.
@@ -84,7 +87,7 @@ class ScenePreviewTest {
         }
         // Identity proves replacement without assuming cross-ViewModel generation ordering.
         assertNotSame(retriedView, webView())
-        compose.onNodeWithText("idle").performScrollTo().assertIsSelected()
+        compose.onNodeWithText("Idle").performScrollTo().assertIsSelected()
         compose.onNodeWithText("60 FPS").performScrollTo().assertIsSelected()
         compose.onNodeWithText("Resume").performScrollTo().assertIsDisplayed().performClick()
         ready()

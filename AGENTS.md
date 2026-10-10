@@ -127,7 +127,7 @@ for a new Surface object), keeping the Presentation/WebView. Independent `wallpa
 expose them, with no UI yet (W04b). The engine follows them and rebuilds its generation on change.
 FPS/energy/landscape remain unmeasured (deferred by user); single device.
 
-W04b: stateless `ui/WallpaperSection` (heading, scene chips in a `selectableGroup`, FPS chips, tags
+W04b (UI superseded by R04): stateless `ui/WallpaperSection` (heading, scene chips in a `selectableGroup`, FPS chips, tags
 `wallpaper-scene-<id>` / `wallpaper-fps-<n>` / `wallpaper-set`) writes the wallpaper keys only.
 Chip text semantics are cleared and replaced by "Wallpaper scene <id>" / "Wallpaper <n> FPS"
 content descriptions, so text-based preview tests stay unambiguous. "Set as wallpaper" opens
@@ -149,10 +149,36 @@ O03a: `OverlayPlacement` sizes the WebView at 0.42 × short side inside a 0.95-c
 Persisted `overlay_move_mode` (default on since O03e) and `overlay_x`/`overlay_y`; move mode clears
 FLAG_NOT_TOUCHABLE live and `OverlayFrame` intercepts every touch to drag (clamped, saved on UP/CANCEL),
 so the WebView never gets input. Off = pass-through. Drag/persist/pass-through verified once on device (moto g84).
-O03d: independent `overlay_scene`/`overlay_fps` keys (default idle/30; unset or invalid never falls back to the
+O03d (superseded by R04; keys left unread): independent `overlay_scene`/`overlay_fps` keys (default idle/30; unset or invalid never falls back to the
 wallpaper) in `OverlaySettings.content`; `OverlaySection` chips `overlay-scene-<id>` / `overlay-fps-<n>` mirror
 W04b ("Overlay scene <id>" / "Overlay <n> FPS"). The service follows them (always MINI) and rebuilds only on
 scene/FPS change, not move mode or position; wallpaper keys no longer affect it. `OverlaySectionTest` is compiled only.
+
+R-redesign (R01–R03): fixed dark processing palette (`ui/theme/Color.kt`, no `values-night`), Ciel logo
+(`drawable-nodpi/ciel_logo.png`, non-original, outside the 56 originals) as adaptive icon and header mark.
+Headings (R03; R04 replaced the last two with Mode): app name, Preview, Live wallpaper, Floating mini scene. Only the preview shows visible scene/FPS
+chips, with friendly names (`sceneLabel`); asset ids stay internal. Wallpaper/overlay show one clickable
+`wallpaper-content`/`overlay-content` row ("Scene: <Name> · <n> FPS", "Not available yet" while disabled)
+that opens an `AlertDialog` (`<prefix>-selector`, `<prefix>-selector-done`) holding the unchanged option tags
+and descriptions. `preview-status` reads Loading/Running/Paused/error (Running = READY and resumed); the
+generation is test-only semantics (`PreviewGenerationKey`), never text. Removed: validation_pending,
+preview instance, scene_ready, Prototype copy and Future modes.
+
+R04: one shared scene/FPS config, the `preview_scene`/`preview_fps` keys: the preview (FULL), the wallpaper engine
+(FULL) and `MiniOverlayService` (always MINI) all read `SettingsState.settings` and rebuild their generation on
+change; unreadable settings fall back to `PreviewSettings()` (processing/30). The W04a `wallpaper_*` and O03d
+`overlay_scene`/`overlay_fps` keys are no longer read and are left in the store (no migration/deletion); their
+setters, `SettingsState.wallpaper`, `OverlaySettings.content` and the per-surface defaults are removed. New
+`active_mode` key (`ActiveMode` WALLPAPER default | MINI; unset/invalid/wrong type → WALLPAPER). `ui/ModeSection`
+("Mode" heading) is a `SingleChoiceSegmentedButtonRow` (selectableGroup, RadioButton segments `mode-wallpaper` /
+`mode-mini`, "Scene Wallpaper" / "Scene Mini") that composes only the selected mode's controls plus the hint
+"Uses the preview's scene and frame rate.": `WallpaperControls` (`wallpaper-set`) or `MiniControls`
+(`overlay-start`/`overlay-stop`/`overlay-grant`, `overlay-move-mode`). Selecting Wallpaper stops the overlay service.
+In Mini mode, when `WallpaperManager.getWallpaperInfo(FLAG_SYSTEM|FLAG_LOCK)` is CielDroid's (no permission on API 34+:
+own-package visibility), a notice plus `wallpaper-change` opens the `ACTION_SET_WALLPAPER` chooser; re-checked on
+resume; the app never clears the wallpaper. Selector dialogs/summary rows are removed. Device (moto g84): overlay
+rebuilt on preview scene and FPS changes; system preview engine used the shared config; the active-wallpaper notice
+was only exercised statelessly (the CielDroid wallpaper was never applied).
 
 ## Change boundaries
 

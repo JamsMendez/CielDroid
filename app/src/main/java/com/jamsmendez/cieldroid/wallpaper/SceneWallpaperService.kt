@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "CielWallpaper"
 
-/** Provisional pipeline 1 renderer: unmeasured beyond the W02 pilot; settings come from the wallpaper keys. */
+/** Provisional pipeline 1 renderer: unmeasured beyond the W02 pilot; settings come from the shared preview keys. */
 class SceneWallpaperService : WallpaperService() {
     override fun onCreateEngine(): Engine = SceneEngine()
 
@@ -111,10 +111,10 @@ class SceneWallpaperService : WallpaperService() {
                 repository.state
                     .mapNotNull { state ->
                         when {
-                            state.loaded -> state.wallpaper
+                            state.loaded -> state.settings
                             state.error != null -> {
-                                Log.w(TAG, "wallpaper settings unreadable; using defaults", state.error)
-                                PreviewSettings.WALLPAPER_DEFAULT
+                                Log.w(TAG, "shared settings unreadable; using defaults", state.error)
+                                PreviewSettings()
                             }
                             else -> null
                         }

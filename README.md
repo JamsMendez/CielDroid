@@ -182,7 +182,7 @@ from `preview_scene` / `preview_fps` in the same DataStore, exposed through the 
 ViewModel without UI. The engine follows them and rebuilds its generation on change. FPS, energy and
 landscape are still unmeasured (deferred by the user); single device; no wallpaper UI yet (W04b).
 
-W04b adds a "Live wallpaper" section below the preview: its own scene and FPS chips (independent of
+W04b (UI superseded by R04) adds a "Live wallpaper" section below the preview: its own scene and FPS chips (independent of
 the preview chips) and a "Set as wallpaper" button. The button opens the system live wallpaper
 preview (`ACTION_CHANGE_LIVE_WALLPAPER` for `SceneWallpaperService`); you confirm it there, and
 CielDroid never applies a wallpaper itself. If no picker exists, an inline message is shown. A
@@ -207,10 +207,31 @@ settings store; the position is restored on start. Clamping it to the screen (on
 change) is display-only and never persisted, so rotating back restores the original spot; only a real
 drag persists a new position.
 
-O03d: the floating mini scene has its own scene and FPS chips, independent of the live wallpaper
+O03d (superseded by R04): the floating mini scene has its own scene and FPS chips, independent of the live wallpaper
 (`overlay_scene`/`overlay_fps` in the shared settings store, default idle at 30 fps). A running overlay
 rebuilds its scene when you change them; move mode and the saved position do not rebuild it. Not yet
 checked on device; `OverlaySectionTest` is compiled, not executed.
+
+R02 logo: `res/drawable-nodpi/ciel_logo.png` is a non-original adaptation, a byte-identical copy of
+CielWin's `CielWin.App/Assets/raphael-mini.png` (256×256, MIT, © 2026 Jose A. Mendez Santiago). It
+is outside the 56-original `SceneAssets` inventory and the verifier's `scenes/` scan. It is the
+adaptive launcher icon foreground and monochrome layer (20% inset, inside the safe zone, on the
+`#01040A` scene background) and the decorative header mark; the template robot icons are removed.
+
+R03 launcher: the preview card keeps the only visible scene/FPS chips, with friendly names (Processing,
+Explorer, Idle, Raphael). Live wallpaper and the floating mini scene each show one "Scene: <Name> · <n> FPS"
+row; tapping it opens a selector that writes their own keys. The status line reads Loading, Running,
+Paused or an error; developer text and the "Future modes" section are gone. Instrumentation on the moto g84
+(API 35): `am instrument` OK, 19 tests.
+
+R04 shared config and mode: the preview's scene and FPS are the one shared config. The live wallpaper and the
+floating mini scene both follow it and rebuild when it changes (the mini scene is always MINI). The older
+per-surface `wallpaper_*` and `overlay_scene`/`overlay_fps` keys are no longer read and stay in the store
+untouched. A "Mode" card picks Scene Wallpaper (default) or Scene Mini (`active_mode`), and shows only that
+mode's controls. Choosing Scene Wallpaper stops a running mini scene. In Scene Mini, if CielDroid's live
+wallpaper is still active, a notice offers "Change wallpaper", which opens the system wallpaper chooser;
+CielDroid never clears the wallpaper itself, and needs no new permission. Instrumentation on the moto g84:
+`am instrument` OK, 21 tests.
 
 ## Build and verification
 

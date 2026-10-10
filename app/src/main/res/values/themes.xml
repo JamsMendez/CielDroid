@@ -1,8 +1,9 @@
 <resources>
-    <style name="Theme.CielDroid" parent="android:style/Theme.Material.Light.NoActionBar">
+    <!-- Always dark: the launcher uses the processing scene palette regardless of the system theme. -->
+    <style name="Theme.CielDroid" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:windowBackground">#FAF9FD</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/ciel_background</item>
     </style>
 </resources>

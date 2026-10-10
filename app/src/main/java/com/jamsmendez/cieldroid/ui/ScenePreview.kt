@@ -1,11 +1,13 @@
 package com.jamsmendez.cieldroid.ui
 
 import android.view.View
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -70,19 +74,10 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
         controller.manualPause(manuallyPaused)
         controller.ownerResumed(visible)
     }
-    val viewportDescription = stringResource(R.string.scene_viewport_description, settings.scene.assetId, settings.fps.value)
+    val viewportDescription = stringResource(
+        R.string.scene_viewport_description, stringResource(sceneLabel(settings.scene)), settings.fps.value)
     val viewportState = stringResource(if (session.ownerResumed) R.string.scene_state_running else R.string.scene_state_paused)
-    Column {
-        Text(
-            when (session.phase) {
-                SessionPhase.LOADING -> stringResource(R.string.scene_loading)
-                SessionPhase.READY -> stringResource(R.string.scene_ready)
-                SessionPhase.ERROR -> stringResource(R.string.scene_failed, session.error.orEmpty())
-                SessionPhase.DISPOSED -> stringResource(R.string.scene_released)
-            },
-            modifier = Modifier.testTag("preview-status").semantics { liveRegion = LiveRegionMode.Polite },
-        )
-        Text(stringResource(R.string.preview_instance, generation), modifier = Modifier.testTag("preview-generation"))
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(
             // Semantics live on this wrapper: the interop view replaces the AndroidView's own
             // node in the platform accessibility tree, dropping semantics set on AndroidView.
@@ -91,6 +86,7 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
                 .semantics {
                     contentDescription = viewportDescription
                     stateDescription = viewportState
+                    previewGeneration = generation
                 }
                 .onGloballyPositioned { coordinates ->
                     val bounds = coordinates.boundsInRoot()
@@ -114,5 +110,23 @@ fun ScenePreview(settings: PreviewSettings, generation: Long, manuallyPaused: Bo
                 update = {},
             )
         }
+        // "Running" only once the running session reached both readiness markers; a paused session reads
+        // "Paused" whether or not it finished loading, since loading does not progress while paused.
+        Text(
+            when (session.phase) {
+                SessionPhase.LOADING -> stringResource(if (session.ownerResumed) R.string.scene_loading else R.string.scene_state_paused)
+                SessionPhase.READY -> viewportState
+                SessionPhase.ERROR -> stringResource(R.string.scene_failed)
+                SessionPhase.DISPOSED -> stringResource(R.string.scene_released)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (session.phase == SessionPhase.ERROR) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.testTag("preview-status").semantics { liveRegion = LiveRegionMode.Polite },
+        )
     }
 }
+
+/** Test-only generation of the preview owner; never shown as text or exposed to accessibility services. */
+val PreviewGenerationKey = SemanticsPropertyKey<Long>("PreviewGeneration")
+private var SemanticsPropertyReceiver.previewGeneration by PreviewGenerationKey

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.SettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
+import com.jamsmendez.cieldroid.domain.ActiveMode
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.SceneId
 import kotlinx.coroutines.CancellationException
@@ -26,28 +27,31 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
 
     fun selectScene(scene: SceneId) = write(PREVIEW_ERROR) { repository.setScene(scene) }
     fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
-    fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
-    fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
-    fun selectOverlayScene(scene: SceneId) = write(OVERLAY_ERROR) { repository.setOverlayScene(scene) }
-    fun selectOverlayFps(fps: PreviewFps) = write(OVERLAY_ERROR) { repository.setOverlayFps(fps) }
+    /** [onSaved] runs on the main thread only after the mode is persisted; a gated or failed write skips it. */
+    fun selectMode(mode: ActiveMode, onSaved: () -> Unit = {}) =
+        write(MODE_ERROR, onSaved) { repository.setActiveMode(mode) }
 
     fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
 
-    private fun write(errorMessage: String, update: suspend () -> Unit) {
+    private fun write(errorMessage: String, onSuccess: () -> Unit = {}, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
         viewModelScope.launch {
             try {
                 update()
                 mutableWriteError.value = null
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { mutableWriteError.value = errorMessage }
+            catch (_: Exception) {
+                mutableWriteError.value = errorMessage
+                return@launch
+            }
+            onSuccess()
         }
     }
 
     companion object {
         private const val PREVIEW_ERROR = "Could not save preview settings. Try selecting again."
         private const val OVERLAY_ERROR = "Could not save overlay settings. Try again."
-        private const val WALLPAPER_ERROR = "Could not save wallpaper settings. Try selecting again."
+        private const val MODE_ERROR = "Could not save the mode. Try selecting again."
 
         fun factory(context: Context): ViewModelProvider.Factory {
             val app = context.applicationContext
