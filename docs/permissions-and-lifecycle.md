@@ -19,7 +19,7 @@ Local HTTPS is an AssetLoader origin, not network use. [WebViewSceneRuntime](../
 | [WebViewSceneRuntime](../app/src/main/java/com/jamsmendez/cieldroid/scenes/WebViewSceneRuntime.kt) | Fresh views start paused. Captures immutable generation; release removes queued callbacks, stops, pauses, detaches and destroys the view. Renderer death releases the view and reports error; explicit retry replaces owner. No global pauseTimers. |
 | [PreviewViewModel](../app/src/main/java/com/jamsmendez/cieldroid/ui/PreviewViewModel.kt) / [PreferencesSettingsRepository](../app/src/main/java/com/jamsmendez/cieldroid/data/PreferencesSettingsRepository.kt) | Application-context singleton DataStore per file, ViewModel-owned observation; only preview_scene/preview_fps persisted. Atomic edits preserve other keys. Failed writes stay visible; read failure ends observation and needs repository recreation after storage repair. |
 
-Generation numbers belong to a ViewModel, not a process-global identity contract. Recreation tests compare actual WebView instances instead of assuming monotonic IDs across different models. Rotation/settings retention, pause behavior and cleanup still require [device execution](test-plan.md).
+Generation numbers belong to a ViewModel, not a process-global identity contract. Recreation tests compare actual WebView instances instead of assuming monotonic IDs across different models. C15 [device execution](test-plan.md) on one API 35 phone passed retry/recreation instrumentation and human-reported pause/resume, background/return and rotation checks; resource cleanup and timeout suspension are not measured on device.
 
 ## Future modes: separate investigation
 

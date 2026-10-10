@@ -1,9 +1,9 @@
-# Original scene preview: implemented, device proof pending
+# Original scene preview: implemented, partial device evidence
 
 The Compose launcher now connects the four original FULL scenes to persisted scene
 and 30/60 FPS selection. Each scene, FPS change or retry creates a new session and
 WebView. Build and deterministic tests are not proof of Android rendering; the
-native scenarios have only been compiled, not executed on a device.
+instrumentation scenarios passed on one API 35 phone in C15 (see the test plan).
 
 ## Review path and ownership
 
@@ -62,7 +62,7 @@ Host tests cover policy/CSP/session/persistence plus controller visibility,
 stale callbacks, manual pause, timeout suspension, readiness/error/disposal
 cleanup, fresh generations and ViewModel not-loaded/write-failure behavior.
 Android-specific CSP and WebView behavior use compilation and structural checks
-because no device runner is available; artificial instrumentation RED was not
+because no device runner was available before C15; artificial instrumentation RED was not
 claimed. `BootstrapTest` checks truthful UI; `ScenePreviewTest` exercises all four
 FULL scenes at both rates, retry, manual pause and activity recreation. Paused
 retry/recreation assert retained Resume control and real WebView replacement,
@@ -83,7 +83,7 @@ runtime/ViewModel 2.9.2 are pinned; DataStore 1.1.7 and coroutines 1.10.2 remain
 See the [test plan](test-plan.md) for the acceptance matrix and evidence history,
 [permissions/lifecycle](permissions-and-lifecycle.md) for source-mapped boundaries,
 and [renderer decision](renderer-decision.md) for future prototype alternatives.
-Phase 0/1 code is complete, but device acceptance remains pending. Phase 2 overlay,
+Phase 0/1 code is complete; C15 recorded one-device instrumentation and manual checks, but visual fidelity, cadence and accessibility acceptance remain pending. Phase 2 overlay,
 phase 3 wallpaper and phase 4 widget implementation and independent owner
 configuration are deferred; no wallpaper renderer has been selected or proven viable. Publishing rights, remote CI and real device behavior remain
-unverified. C14 adds no staging, publishing or SDK installs; its native review and local commit are pending.
+unverified. C14 added no staging, publishing or SDK installs and closed at `42dc3b1`.

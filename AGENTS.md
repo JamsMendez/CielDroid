@@ -77,12 +77,23 @@ lifecycle and accessibility acceptance remain pending; readiness is not pixels p
 
 C14 consolidates `docs/architecture.md`, `docs/permissions-and-lifecycle.md`,
 `docs/renderer-decision.md` and `docs/test-plan.md` (linked from README), audited against
-committed code and C13 results. C14 device gates remain pending (no device/adb available):
-`./gradlew :app:connectedDebugAndroidTest` on a physical device, launch, light/dark,
-scene/FPS switching, pause/resume/retry, background, rotation and visual fidelity.
+committed code and C13 results. No device/adb was available during C14; its device
+gates were executed in C15.
 Independent isolated C14 checks passed: four offline wrapper checks, 16 fresh host
 tests, zero failures/errors/skips, lint 0 errors/8 warnings, 56 assets; comment-only
-`rules.keep` has no effect (minify off). Native review and local commit pending.
+`rules.keep` has no effect (minify off). Native approval/exact acknowledgement (burned)
+and local commit closed at `42dc3b1`.
+
+C15 device run: motorola moto g84 5G, Android 15 / API 35, Adreno 619 / OpenGL ES 3.2,
+committed tree `42dc3b1`. Offline `connectedDebugAndroidTest` could not run (UTP
+`gradle-work-action:32.4.1` not cached); `adb install -r` plus `am instrument` gave OK
+(3 tests: BootstrapTest launcher, ScenePreviewTest retry/recreation, four scenes × both
+rates readiness). No app crash/CSP/Uncaught/WebGL logcat errors; human manual checklist
+(launch, scenes, FPS, pause/resume/retry, background/return, rotation, themes) reported OK.
+Known deferred issue: element scale/sizing on phone (upstream desktop-sized layout,
+`width=device-width,initial-scale=1`, no adapter zoom); original bytes preserved. Not
+automated visual/pixel, cadence or accessibility proof; accessibility, cadence, security
+audit, licensing, remote CI and publishing remain pending. C15 native review/local commit pending.
 
 ## Change boundaries
 

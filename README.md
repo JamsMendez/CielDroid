@@ -118,14 +118,28 @@ cadence, lifecycle and accessibility acceptance remain pending; readiness is not
 C14 consolidates the evidence documentation: [architecture](docs/architecture.md),
 [permissions and lifecycle](docs/permissions-and-lifecycle.md),
 [renderer decision](docs/renderer-decision.md) and [test plan](docs/test-plan.md),
-audited against the committed C03–C13 code and the C13 check results. C14 device gates
-remain pending because no device or adb was available: `./gradlew :app:connectedDebugAndroidTest`
-on a physical device, launch, light/dark themes, scene/FPS switching, pause/resume/retry,
-background/return, rotation and visual fidelity. Independent isolated C14 verification
+audited against the committed C03–C13 code and the C13 check results. No device or adb
+was available during C14; its device gates were executed in C15. Independent isolated C14 verification
 passed four offline wrapper checks (assemble 36 executed, forced host 24, lint 9/18, test
 APK 30/20), 16 fresh host tests with zero failures/errors/skips, lint 0 errors/8 warnings
 and 56 assets / 940651 bytes; the comment-only `rules.keep` has no effect (minify off).
-Native review and local commit are pending.
+Native approval/exact acknowledgement (burned) and local commit closed at `42dc3b1`.
+
+C15 device acceptance ran on a motorola moto g84 5G (Android 15 / API 35, Adreno 619 /
+OpenGL ES 3.2) against committed tree `42dc3b1`. `connectedDebugAndroidTest --offline`
+could not run (UTP `com.android.tools.utp:gradle-work-action:32.4.1` is not in the offline
+Gradle cache), so offline-built APKs were installed with `adb install -r` and run through
+`am instrument`: OK (3 tests) — `BootstrapTest.launcherShowsTruthfulPreviewAndFutureModeStatus`,
+`ScenePreviewTest.retryReplacesOwnerAndRecreationRetainsPersistedSettings` and
+`ScenePreviewTest.fourOriginalScenesReachBothReadinessMarkersAtBothRates`. Logcat showed no
+app crash, CSP, Uncaught or WebGL errors. The human manual checklist (launch, scene switching,
+FPS, pause/resume/retry, background/return, rotation, themes) was reported OK. Known issue,
+deferred: scene element scale/sizing on the phone, consistent with the upstream CieLinux
+desktop-sized layout (viewport `width=device-width,initial-scale=1`, no adapter zoom
+overrides); original bytes are preserved. Readiness markers and human observation are not
+automated visual/pixel, cadence or accessibility proof; accessibility, cadence measurement,
+security audit, licensing, remote CI and publishing remain pending. C15 native review and
+local commit are pending.
 
 ## Build and verification
 
@@ -140,6 +154,10 @@ Compose compiler matches Kotlin, independently of the Compose BOM.
 ./gradlew :app:lintDebug
 ./gradlew :app:assembleDebugAndroidTest
 ```
+
+`adb` lives at `$ANDROID_HOME/platform-tools/adb`. When the UTP runner is unavailable
+offline, install both APKs with `adb install -r` and run
+`adb shell am instrument -w -r com.jamsmendez.cieldroid.test/androidx.test.runner.AndroidJUnitRunner`.
 
 Historical C03 evidence only: the four isolated checks passed, including eight
 freshly executed host tests: seven functional domain/repository/ViewModel tests
