@@ -41,6 +41,18 @@ not enforce GET, no-network fallback, no JavaScript interface or WebView lifecyc
 the future adapter must enforce these. Exact generation/source/both-marker readiness
 is not pixels/GPU proof. Keep original asset qrc CSPs, headers and license bytes intact.
 
+C11 imports the unchanged owner controller and three test methods: 137 Kotlin lines.
+Resumed-loading timeout and cleanup are foundations, not WebView/UI integration.
+Main-thread ownership is a caller precondition; visibility callback order is not
+asserted by these tests. Independent full C11 verification passed all three controller
+methods: 16 fresh host tests (15 functional), zero failures/errors/skips; four offline
+checks passed. README records provenance, manifests, daemon evidence and I05 qualification.
+Initial strict audit passed; FINAL strict audit/acceptance FAILED exit 1 for common root
+DIRECTORY and three object FILE mtimes only, equal SHA/size/mode/nlink, UNKNOWN writer.
+Human accepted ONLY C11 qualified continuation; no retroactive PASS or future waiver.
+Native consent/final identity/local commit remain pending, as do C12 adapter/C13 UI;
+the launcher stays catalog-only and readiness is not pixels/GPU proof. Device gates remain pending.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.
@@ -155,8 +167,9 @@ pure tree/raw indexes/future 11/backups six/`.atl` were unchanged; parent-owned 
 edits outside the candidate are not Git attribution. Human accepted ONLY C10 qualified
 continuation (`continue_c10_qualified_root_and_object_mtimes`), not retroactive PASS,
 blanket waiver, repairs, passing-check reruns or publishing. C05/C06a/I02/I03 remain
-qualified. Final input verification/native approval/acknowledgement/local commit and
-device acceptance remain PENDING; host tests and readiness are not asset/pixels/GPU proof.
+qualified. Final input verification/native approval/exact acknowledgement (burned) and local
+commit closed at `1352f49`; device acceptance remains pending. I04 grants no new waiver;
+host tests and readiness are not asset/pixels/GPU proof.
 Final UI documentation restoration remains C13/C14 work, not this slice.
 The arithmetic example is not functional.
 Build output and test APK assembly do not prove device behavior. Report failures

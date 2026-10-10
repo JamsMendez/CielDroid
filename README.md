@@ -63,6 +63,15 @@ URL policy alone does not enforce GET, no-network fallback, no JavaScript interf
 or WebView lifecycle: those remain future adapter responsibilities. Readiness markers
 are not pixels/GPU proof. Original asset qrc CSPs, headers and license bytes stay intact.
 
+C11 imports the unchanged owner controller and three host test methods (137 Kotlin
+lines). It coordinates visibility, resumed-loading timeout and generation-owned cleanup;
+main-thread ownership is a caller precondition, not enforced. Tests do not assert
+visibility callback ordering. Independent full C11 verification passed all three
+controller methods within 16 fresh host tests (15 functional, one arithmetic), with
+zero failures/errors/skips. The qualified verification record below retains I05's
+failed final strict audit. Native consent, final identity and authorized local commit
+remain pending; C12's adapter and C13's UI are not integrated. Readiness is not pixels/GPU proof.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
@@ -217,9 +226,40 @@ main-ledger interim edits were outside the candidate, not Git-writer attribution
 Human selected `continue_c10_qualified_root_and_object_mtimes`: ONLY this C10 qualified
 continuation, not retroactive PASS, blanket future waiver, repairs, passing-check reruns
 or publishing. C05/C06a/I02/I03 historical qualifications remain; the final failed gate
-is preserved. C10 final input verification, native approval, exact acknowledgement,
-local commit and device acceptance remain PENDING; no UI/runtime integration is proved.
+is preserved. C10 final input verification, native approval and exact acknowledgement
+(burned) closed in local commit `1352f49`; device acceptance remains pending.
+No UI/runtime integration is proved, and I04 grants no new candidate waiver.
 Final UI documentation restoration belongs to C13/C14, not this slice.
+
+C11 independent verification ran four separate offline wrapper checks once each, all
+exit 0: assemble 18 executed/18 up-to-date, forced host tests 24 executed, lint 9
+executed/18 up-to-date, test APK 30 executed/20 up-to-date. All three controller and
+five core methods passed within 16 fresh tests (15 functional, one arithmetic), with
+zero failures/errors/skips. Lint: 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Both validators exited 0; separate checks match exactly 56 originals / 940651 bytes
+against the catalog, actual committed upstream `a31faf9` and production APK, with no
+extras; test APK assets: zero. Four original qrc CSPs at line 5 and OFL.txt:21 remain intact.
+Binary manifests attest `com.jamsmendez.cieldroid`, min35/target37, sole MainActivity
+launcher, no services or Internet/overlay/wallpaper permissions. AndroidX signature
+permission/startup provider/DUMP-protected receiver mean production is not permission-free;
+test AndroidJUnitRunner and REORDER_TASKS remain separate. Four actual daemon-25
+request/context pairs (PID 372902): 25381/25398, 25433/25450, 25487/25504, 25539/25556;
+release 25.0.3 differs from launcher 26.0.2.1. Test APK compilation is not device execution;
+preDebugAndroidTestBuild was SKIPPED in lint/test-APK; NO-SOURCE is not a JUnit skip.
+Initial strict audit passed; FINAL strict audit/acceptance FAILED exit 1: common `.git`
+root DIRECTORY and three existing object FILE mtimes only, equal file SHA and all
+size/mode/nlink values, writer UNKNOWN. Both 116-entry candidate source/index sets,
+HEAD, four staged paths, pure tree, raw indexes, future nine, three preservation and
+six prior backups, ledger, local.properties, `.atl` and nine linked metadata entries
+were unchanged. Parent paused ledger/source/Git writes throughout, not writer attribution.
+Human selected `continue_c11_qualified_root_and_object_mtimes`: ONLY this C11 qualified
+continuation, preserving passes and FAILED/UNKNOWN history; no inherited I04 waiver,
+retroactive PASS, future waiver, repairs, passing-check reruns or publishing.
+C05/C06a/I02/I03/I04 qualifications remain; a later current PASS/native approval cannot
+erase I05. Native current consent, final identity and authorized local commit remain pending.
+Saved isolated `build/verification/c11-independent-{acceptance,proof,provenance,manifests}.json`
+and logs/exits hold the evidence. Host tests/readiness are not asset/pixels/GPU proof;
+device, visual/GPU/WebGL, cadence, accessibility and runtime lifecycle gates remain pending.
 
 ## Scope and distribution limits
 
