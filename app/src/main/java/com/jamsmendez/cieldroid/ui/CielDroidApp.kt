@@ -1,5 +1,6 @@
 package com.jamsmendez.cieldroid.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -7,8 +8,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -46,8 +49,7 @@ fun CielDroidApp() {
                 .verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.semantics { heading() })
+            AppHeader()
             Text(stringResource(R.string.preview_title), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.validation_pending))
@@ -100,5 +102,15 @@ fun CielDroidApp() {
                 modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.future_modes_explanation))
         }
+    }
+}
+
+/** Decorative logo beside the app name; the name alone is the heading TalkBack reads. */
+@Composable
+private fun AppHeader() {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Image(painterResource(R.drawable.ciel_logo), contentDescription = null, modifier = Modifier.size(48.dp))
+        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.semantics { heading() })
     }
 }

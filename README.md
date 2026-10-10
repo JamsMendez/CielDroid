@@ -212,6 +212,12 @@ O03d: the floating mini scene has its own scene and FPS chips, independent of th
 rebuilds its scene when you change them; move mode and the saved position do not rebuild it. Not yet
 checked on device; `OverlaySectionTest` is compiled, not executed.
 
+R02 logo: `res/drawable-nodpi/ciel_logo.png` is a non-original adaptation, a byte-identical copy of
+CielWin's `CielWin.App/Assets/raphael-mini.png` (256×256, MIT, © 2026 Jose A. Mendez Santiago). It
+is outside the 56-original `SceneAssets` inventory and the verifier's `scenes/` scan. It is the
+adaptive launcher icon foreground and monochrome layer (20% inset, inside the safe zone, on the
+`#01040A` scene background) and the decorative header mark; the template robot icons are removed.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
