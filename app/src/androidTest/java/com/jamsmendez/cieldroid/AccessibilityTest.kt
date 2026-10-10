@@ -45,7 +45,8 @@ class AccessibilityTest {
     @Test fun sectionTitlesAreHeadings() {
         launched()
         val heading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
-        listOf(R.string.app_name, R.string.preview_title, R.string.scene_label, R.string.future_modes)
+        listOf(R.string.app_name, R.string.preview_title, R.string.scene_label, R.string.wallpaper_title,
+            R.string.future_modes)
             .forEach { compose.onNode(hasText(string(it)) and heading).assertExists() }
     }
 
@@ -54,6 +55,19 @@ class AccessibilityTest {
         val group = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
         listOf("processing", "explorer", "idle", "raphael")
             .forEach { compose.onNode(hasText(it) and group).assertExists() }
+    }
+
+    @Test fun wallpaperChipsAreGroupedAndDescribedApartFromPreviewChips() {
+        launched()
+        val group = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+        listOf("processing", "explorer", "idle", "raphael").forEach {
+            compose.onNode(hasTestTag("wallpaper-scene-$it") and group)
+                .assertContentDescriptionEquals(string(R.string.wallpaper_scene_chip_description, it))
+        }
+        listOf(30, 60).forEach {
+            compose.onNode(hasTestTag("wallpaper-fps-$it") and group)
+                .assertContentDescriptionEquals(string(R.string.wallpaper_fps_chip_description, it))
+        }
     }
 
     @Test fun previewStatusIsPoliteLiveRegion() {

@@ -35,6 +35,8 @@ class SceneWallpaperService : WallpaperService() {
         private var surfaceSpec: DisplaySpec? = null
         private var nextGeneration = 1L
         private var generation: Generation? = null
+        /** Set when the framework reports a new surface while a generation still renders to the old one. */
+        private var surfaceRecreated = false
 
         /** One VirtualDisplay, Presentation, controller and WebView; never shared, released as one unit. */
         private inner class Generation(
@@ -131,14 +133,18 @@ class SceneWallpaperService : WallpaperService() {
 
         override fun onSurfaceCreated(holder: SurfaceHolder) {
             super.onSurfaceCreated(holder)
-            Log.i(TAG, "surface created")
+            // The holder reuses one Surface object and swaps its native buffer queue in place, so a
+            // reference comparison never sees a recreation; this callback is the reliable signal.
+            surfaceRecreated = generation != null
+            Log.i(TAG, "surface created recreatedUnderGeneration=$surfaceRecreated")
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
             val dpi = resources.displayMetrics.densityDpi
             val current = generation
-            val surfaceChanged = current != null && current.surface !== holder.surface
+            val surfaceChanged = current != null && surfaceRecreated
+            surfaceRecreated = false
             when (val plan = DisplayPlan.of(current?.spec, width, height, dpi, surfaceChanged)) {
                 is DisplayPlan.Create -> {
                     surfaceSpec = plan.spec
@@ -196,6 +202,7 @@ class SceneWallpaperService : WallpaperService() {
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
             surfaceSpec = null
+            surfaceRecreated = false
             releaseGeneration("surface destroyed")
             super.onSurfaceDestroyed(holder)
         }

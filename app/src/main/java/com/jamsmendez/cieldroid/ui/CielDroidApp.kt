@@ -20,13 +20,15 @@ import com.jamsmendez.cieldroid.domain.*
 
 @Composable
 fun CielDroidApp() {
-    val app = LocalContext.current.applicationContext
+    val context = LocalContext.current
+    val app = context.applicationContext
     val factory = remember(app) { PreviewViewModel.factory(app) }
     val vm: PreviewViewModel = viewModel(factory = factory)
     val settings by vm.settings.collectAsStateWithLifecycle()
     val writeError by vm.writeError.collectAsStateWithLifecycle()
     var manuallyPaused by rememberSaveable { mutableStateOf(false) }
     var retry by remember { mutableIntStateOf(0) }
+    var pickerUnavailable by rememberSaveable { mutableStateOf(false) }
     val generation = remember(settings.loaded, settings.settings, retry) { vm.nextGeneration() }
     val enabled = settings.loaded && settings.error == null
 
@@ -71,6 +73,11 @@ fun CielDroidApp() {
             if (enabled) key(generation) {
                 ScenePreview(settings.settings, generation, manuallyPaused)
             }
+            WallpaperSection(
+                wallpaper = settings.wallpaper, enabled = enabled, pickerUnavailable = pickerUnavailable,
+                onSceneSelected = vm::selectWallpaperScene, onFpsSelected = vm::selectWallpaperFps,
+                onSetWallpaper = { pickerUnavailable = !context.openLiveWallpaperPicker() },
+            )
             Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.future_modes_explanation))

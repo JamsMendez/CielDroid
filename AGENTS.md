@@ -127,6 +127,15 @@ for a new Surface object), keeping the Presentation/WebView. Independent `wallpa
 expose them, with no UI yet (W04b). The engine follows them and rebuilds its generation on change.
 FPS/energy/landscape remain unmeasured (deferred by user); single device.
 
+W04b: stateless `ui/WallpaperSection` (heading, scene chips in a `selectableGroup`, FPS chips, tags
+`wallpaper-scene-<id>` / `wallpaper-fps-<n>` / `wallpaper-set`) writes the wallpaper keys only.
+Chip text semantics are cleared and replaced by "Wallpaper scene <id>" / "Wallpaper <n> FPS"
+content descriptions, so text-based preview tests stay unambiguous. "Set as wallpaper" opens
+`ACTION_CHANGE_LIVE_WALLPAPER`; the user applies it in the system UI, never the app or tests;
+`ActivityNotFoundException` shows inline text. The engine now detects a recreated surface via
+`onSurfaceCreated` (the holder reuses one `Surface` object, so identity never changed). Limits:
+fps 12.6/30 measured once for idle; energy, landscape, processing/60 unmeasured; single device.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

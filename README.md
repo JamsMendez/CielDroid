@@ -182,6 +182,14 @@ from `preview_scene` / `preview_fps` in the same DataStore, exposed through the 
 ViewModel without UI. The engine follows them and rebuilds its generation on change. FPS, energy and
 landscape are still unmeasured (deferred by the user); single device; no wallpaper UI yet (W04b).
 
+W04b adds a "Live wallpaper" section below the preview: its own scene and FPS chips (independent of
+the preview chips) and a "Set as wallpaper" button. The button opens the system live wallpaper
+preview (`ACTION_CHANGE_LIVE_WALLPAPER` for `SceneWallpaperService`); you confirm it there, and
+CielDroid never applies a wallpaper itself. If no picker exists, an inline message is shown. A
+recreated wallpaper surface is now detected from `onSurfaceCreated`, because the holder keeps one
+`Surface` object. Honest limits: one measurement of the idle scene showed about 12.6 of 30 fps;
+energy, landscape and processing at 60 fps are unmeasured; single device (moto g84).
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
