@@ -15,11 +15,13 @@ import android.util.Log
 import android.view.Display
 import android.view.Gravity
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.FrameLayout
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
+import com.jamsmendez.cieldroid.domain.OverlayDrag
 import com.jamsmendez.cieldroid.domain.OverlayPlacement
 import com.jamsmendez.cieldroid.domain.OverlayPosition
 import com.jamsmendez.cieldroid.domain.PreviewSettings
@@ -48,7 +50,12 @@ class MiniOverlayService : Service() {
     private var settings: PreviewSettings? = null
     private var interactive = true
     private var nextGeneration = 1L
-    private var generation: Generation? = null
+    /** Re-entrancy safe: a release clears the slot first, so late or nested error callbacks are no-ops. */
+    private val slot = GenerationSlot<Generation> { gen ->
+        Log.i(TAG, "gen=${gen.id} released")
+        gen.teardown.releaseAll()
+    }
+    private val generation: Generation? get() = slot.current
     private var screenReceiver: BroadcastReceiver? = null
     private var repository: PreferencesSettingsRepository? = null
     private var moveMode = false
@@ -124,14 +131,18 @@ class MiniOverlayService : Service() {
 
     private fun applySettings(next: PreviewSettings) {
         settings = next
-        releaseGeneration("settings changed to $next")
+        generation?.let { Log.i(TAG, "gen=${it.id} releasing: settings changed to $next") }
         val id = nextGeneration++
-        generation = try {
+        slot.begin(id)
+        val built = try {
             buildGeneration(id, next).also { it.controller.ownerResumed(interactive) }
         } catch (e: Exception) {
             Log.e(TAG, "gen=$id creation failed; no overlay", e)
-            null
+            slot.abort(id)
+            return
         }
+        // A failure reported while building (e.g. a synchronous load error) releases it here instead.
+        if (!slot.install(id, built)) Log.w(TAG, "gen=$id failed while building; no overlay")
     }
 
     /** Builds every part under one release stack, released in reverse order (window removed before destroy). */
@@ -156,7 +167,7 @@ class MiniOverlayService : Service() {
                         Log.i(TAG, "gen=$id phase=${s.first} draw=${s.second} bridge=${s.third} error=$error")
                         // No retry loop: a failed generation removes its window; Start again or new settings rebuild.
                         if (s.first == SessionPhase.ERROR) scope.launch {
-                            if (generation?.id == id) releaseGeneration("gen=$id failed")
+                            if (slot.fail(id)) Log.i(TAG, "gen=$id failed; releasing")
                         }
                     }
             }
@@ -165,11 +176,13 @@ class MiniOverlayService : Service() {
             // The scene keeps its full side; the smaller window crops its transparent border around the ring.
             val frame = OverlayFrame(windowContext)
             frame.addView(created.view, FrameLayout.LayoutParams(size.webSide, size.webSide, Gravity.CENTER))
+            val stored = storedPosition()
             val start = OverlayPlacement.clamp(
-                position ?: repository?.state?.value?.overlay?.position ?: defaultPosition(windowManager, size.windowSide),
+                position ?: stored ?: defaultPosition(windowManager, size.windowSide),
                 size.windowSide, bounds.width(), bounds.height(),
             )
             position = start
+            OverlayPlacement.reclampedToPersist(stored, start)?.let(::persistPosition)
             val params = WindowManager.LayoutParams(
                 size.windowSide, size.windowSide, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 windowFlags(moveMode), PixelFormat.TRANSLUCENT,
@@ -217,29 +230,35 @@ class MiniOverlayService : Service() {
         if (window.frame.isAttachedToWindow) window.manager.updateViewLayout(window.frame, window.params)
     }
 
-    /** Drags move the window clamped to the screen; the position is persisted once, when the gesture ends. */
+    private fun storedPosition(): OverlayPosition? = repository?.state?.value?.overlay?.position
+
+    /**
+     * Drags move the window clamped to the screen; the position is persisted once, when a real drag ends.
+     * A tap (within touch slop) or a drag back to its origin persists nothing, so the default stays unstored.
+     */
     private fun attachDrag(window: Window) {
-        var startX = 0
-        var startY = 0
-        window.frame.onDragStart = {
-            startX = window.params.x
-            startY = window.params.y
-        }
-        window.frame.onDrag = { dx, dy ->
+        val drag = OverlayDrag(ViewConfiguration.get(window.frame.context).scaledTouchSlop)
+        window.frame.onDown = { rawX, rawY -> drag.down(rawX, rawY, OverlayPosition(window.params.x, window.params.y)) }
+        window.frame.onMove = { rawX, rawY ->
             val bounds = window.manager.currentWindowMetrics.bounds
-            val next = OverlayPlacement.clamp(
-                OverlayPosition(startX + dx, startY + dy), window.params.width, bounds.width(), bounds.height(),
-            )
-            window.params.x = next.x
-            window.params.y = next.y
-            position = next
-            updateLayout(window)
+            drag.move(rawX, rawY, window.params.width, bounds.width(), bounds.height())?.let { next ->
+                window.params.x = next.x
+                window.params.y = next.y
+                position = next
+                updateLayout(window)
+            }
         }
-        window.frame.onDragEnd = { persistPosition(OverlayPosition(window.params.x, window.params.y)) }
+        window.frame.onEnd = {
+            val end = drag.end()
+            if (end.dragged) Log.i(TAG, "drag ended persist=${end.persist}") else Log.i(TAG, "tap; nothing persisted")
+            end.persist?.let(::persistPosition)
+            end.dragged
+        }
     }
 
     private fun persistPosition(next: OverlayPosition) {
         val repository = repository ?: return
+        Log.i(TAG, "persisting overlay position $next")
         scope.launch {
             try {
                 repository.setOverlayPosition(next)
@@ -261,21 +280,15 @@ class MiniOverlayService : Service() {
         position = clamped
         updateLayout(window)
         Log.i(TAG, "re-clamped overlay to $clamped for ${bounds.width()}x${bounds.height()}")
-    }
-
-    /** Idempotent: the field is cleared before release. */
-    private fun releaseGeneration(reason: String) {
-        val current = generation ?: return
-        generation = null
-        Log.i(TAG, "gen=${current.id} releasing: $reason")
-        current.teardown.releaseAll()
+        OverlayPlacement.reclampedToPersist(storedPosition(), clamped)?.let(::persistPosition)
     }
 
     override fun onDestroy() {
         scope.cancel()
         screenReceiver?.let { unregisterReceiver(it) }
         screenReceiver = null
-        releaseGeneration("service destroyed")
+        generation?.let { Log.i(TAG, "gen=${it.id} releasing: service destroyed") }
+        slot.clear()
         Log.i(TAG, "service destroyed")
         super.onDestroy()
     }

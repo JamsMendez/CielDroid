@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.jamsmendez.cieldroid.data.PreferencesSettingsRepository
 import com.jamsmendez.cieldroid.data.SettingsRepository
 import com.jamsmendez.cieldroid.data.settingsPreferences
-import com.jamsmendez.cieldroid.domain.OverlayPosition
 import com.jamsmendez.cieldroid.domain.PreviewFps
 import com.jamsmendez.cieldroid.domain.SceneId
 import kotlinx.coroutines.CancellationException
@@ -31,7 +30,6 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
     fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
 
     fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
-    fun saveOverlayPosition(position: OverlayPosition) = write(OVERLAY_ERROR) { repository.setOverlayPosition(position) }
 
     private fun write(errorMessage: String, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return

@@ -58,18 +58,20 @@ class WallpaperSectionTest {
         val target = scenes.first { it != preview && "wallpaper-scene-$it" != originalScene }
         val targetFps = fpsTags.first { it != originalFps }
 
-        selectTag("wallpaper-scene-$target")
-        selectTag(targetFps)
+        try {
+            selectTag("wallpaper-scene-$target")
+            selectTag(targetFps)
 
-        compose.onNodeWithTag("wallpaper-scene-$target").assertIsSelected()
-        compose.onNodeWithTag(targetFps).assertIsSelected()
-        compose.onNodeWithTag(originalFps).assertIsNotSelected()
-        // The preview keeps its own scene: the wallpaper choice never moves the preview chips.
-        compose.onNodeWithText(preview).performScrollTo().assertIsSelected()
-        compose.onNodeWithText(target).performScrollTo().assertIsNotSelected()
-
-        // Restore the persisted wallpaper settings this test changed.
-        selectTag(originalScene)
-        selectTag(originalFps)
+            compose.onNodeWithTag("wallpaper-scene-$target").assertIsSelected()
+            compose.onNodeWithTag(targetFps).assertIsSelected()
+            compose.onNodeWithTag(originalFps).assertIsNotSelected()
+            // The preview keeps its own scene: the wallpaper choice never moves the preview chips.
+            compose.onNodeWithText(preview).performScrollTo().assertIsSelected()
+            compose.onNodeWithText(target).performScrollTo().assertIsNotSelected()
+        } finally {
+            // Restore the persisted wallpaper settings even when an assertion above failed.
+            selectTag(originalScene)
+            selectTag(originalFps)
+        }
     }
 }

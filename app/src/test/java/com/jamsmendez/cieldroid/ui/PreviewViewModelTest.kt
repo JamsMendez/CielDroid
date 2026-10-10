@@ -110,9 +110,7 @@ class PreviewViewModelTest {
             vm.setOverlayMoveMode(true)
             runCurrent()
             assertTrue(vm.settings.value.overlay.moveMode)
-            vm.saveOverlayPosition(OverlayPosition(10, 20))
-            runCurrent()
-            assertEquals(OverlayPosition(10, 20), vm.settings.value.overlay.position)
+            assertNull(vm.settings.value.overlay.position) // the overlay service owns the position, not the VM
             assertEquals(PreviewSettings(), vm.settings.value.settings)
             repo.fail = true
             vm.setOverlayMoveMode(false)
@@ -124,7 +122,7 @@ class PreviewViewModelTest {
             runCurrent()
             assertFalse(vm.settings.value.overlay.moveMode)
             assertNull(vm.writeError.value)
-            assertEquals(4, repo.writes) // the gated first call never wrote
+            assertEquals(3, repo.writes) // the gated first call never wrote
         } finally { Dispatchers.resetMain() }
     }
 }
