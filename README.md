@@ -60,7 +60,7 @@ and generation/source/both-marker session readiness foundations, with five test 
 Full remains implicit: no Mini selector; default settings are processing at 30 fps.
 The launcher is still catalog-only, with no UI controls or runtime integration.
 URL policy alone does not enforce GET, no-network fallback, no JavaScript interface
-or WebView lifecycle: those remain future adapter responsibilities. Readiness markers
+or WebView lifecycle: those are adapter responsibilities, compiled in C12. Readiness markers
 are not pixels/GPU proof. Original asset qrc CSPs, headers and license bytes stay intact.
 
 C11 imports the unchanged owner controller and three host test methods (137 Kotlin
@@ -69,8 +69,36 @@ main-thread ownership is a caller precondition, not enforced. Tests do not asser
 visibility callback ordering. Independent full C11 verification passed all three
 controller methods within 16 fresh host tests (15 functional, one arithmetic), with
 zero failures/errors/skips. The qualified verification record below retains I05's
-failed final strict audit. Native consent, final identity and authorized local commit
-remain pending; C12's adapter and C13's UI are not integrated. Readiness is not pixels/GPU proof.
+failed final strict audit. Native approval/exact acknowledgement (burned) and local
+commit closed at `fddae4c`; C13's UI is not integrated. Readiness is not pixels/GPU proof.
+
+C12 imports the unchanged, compiled
+[WebView adapter](app/src/main/java/com/jamsmendez/cieldroid/scenes/WebViewSceneRuntime.kt)
+(175 Kotlin lines) for one owner generation. It is not launcher-integrated: C13 owns
+ScenePreview/UI wiring and C14 consolidated docs and device gates. `androidx.webkit`
+1.13.0 was already pinned in C02; C12 adds no dependencies or permissions.
+
+| Concern | What the code enforces |
+|---------|------------------------|
+| Loading | `WebViewAssetLoader` serves only `SceneAssets` paths; `index.html` gets the served CSP |
+| Requests | Non-GET, non-policy or released requests get an empty 403/500; never network fallthrough |
+| Navigation | Policy-rejected URLs are overridden; an unexpected main-frame start is stopped and failed |
+| Errors | Policy-resource errors and TLS errors (cancelled) emit `Failure`; renderer loss fails and releases |
+| Web features | File/content access, mixed content, DOM storage, database, cache and geolocation off |
+| Chrome | Popups, permissions, geolocation, file chooser and JS dialogs are denied or cancelled |
+| Bridge | No JavaScript interface; commands use `evaluateJavascript` of `SceneCommand` only |
+| Lifecycle | Starts paused; per-view resume/pause, no global timers; idempotent generation-gated release |
+
+Independent isolated C12 verification passed four offline wrapper checks (assemble 36
+executed, forced host 24, lint 9/18 up-to-date, test APK 30/20 up-to-date): 16 fresh host
+tests (15 functional, one arithmetic), zero failures/errors/skips; lint 0 errors/24 warnings
+(23 UnusedResources, one ObsoleteSdkInt), none in the adapter; one Kotlin deprecation
+warning for `databaseEnabled` (`WebViewSceneRuntime.kt:58`). Both validators and exact
+56-original/940651-byte catalog/committed-upstream/APK checks passed; test APK assets: zero.
+FINAL strict audit FAILED (I06) for the common `.git` root DIRECTORY mtime only, writer
+UNKNOWN; human accepted ONLY C12 qualified continuation, not a retroactive PASS or waiver.
+Native review and local commit are pending. No adapter test or instrumentation was
+executed; nothing is proven on device. Readiness is not pixels proof; GPU/WebGL, cadence and lifecycle gates remain pending.
 
 ## Build and verification
 
@@ -256,7 +284,7 @@ Human selected `continue_c11_qualified_root_and_object_mtimes`: ONLY this C11 qu
 continuation, preserving passes and FAILED/UNKNOWN history; no inherited I04 waiver,
 retroactive PASS, future waiver, repairs, passing-check reruns or publishing.
 C05/C06a/I02/I03/I04 qualifications remain; a later current PASS/native approval cannot
-erase I05. Native current consent, final identity and authorized local commit remain pending.
+erase I05. Native approval/exact acknowledgement (burned) and local commit closed at `fddae4c`.
 Saved isolated `build/verification/c11-independent-{acceptance,proof,provenance,manifests}.json`
 and logs/exits hold the evidence. Host tests/readiness are not asset/pixels/GPU proof;
 device, visual/GPU/WebGL, cadence, accessibility and runtime lifecycle gates remain pending.
