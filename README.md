@@ -55,6 +55,14 @@ Android rendering compatibility. Idle's static references cover all nine JS file
 overlay and Archivo Black/OFL; this bounded dependency
 closure is not dynamic runtime proof.
 
+C10 imports secure URL policy, a literal 56-path allowlist, served-only CSP adaptation
+and generation/source/both-marker session readiness foundations, with five test methods.
+Full remains implicit: no Mini selector; default settings are processing at 30 fps.
+The launcher is still catalog-only, with no UI controls or runtime integration.
+URL policy alone does not enforce GET, no-network fallback, no JavaScript interface
+or WebView lifecycle: those remain future adapter responsibilities. Readiness markers
+are not pixels/GPU proof. Original asset qrc CSPs, headers and license bytes stay intact.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.
@@ -178,7 +186,39 @@ I03's strict audit exited 1 solely for common `.git` root directory mtime drift;
 writer unknown. All 109 source/index entries, HEAD, staged status, pure tree and
 other Git metadata were unchanged; outputs were only ignored build/cache files.
 Human accepted candidate-specific qualified continuation, not a retroactive pass
-or blanket waiver. Final input verification, native review and local commit remain pending.
+or blanket waiver. Final input verification and native approval/exact acknowledgement
+(burned) closed in local commit `195440b`; the failed I03 gate and unknown writer remain.
+C10 controlled RED compiled successfully, then failed its sole fresh CSP test
+with ComparisonFailure (expected self, actual qrc) at SceneCoreTest.kt:20; strict audit passed.
+The fresh focused GREEN rerun passed one test, zero failures/errors/skips, including
+four scenes and malformed-CSP rejection assertions, not the full suite. Independent
+C10 verification then ran four separate offline wrapper checks, all exit 0: assemble
+18 executed/18 up-to-date, forced host tests 24 executed, lint 9 executed/18 up-to-date,
+test APK 30 executed/20 up-to-date. Fresh host execution passed 13 tests (12 functional,
+one arithmetic), including all five core methods, with zero failures/errors/skips.
+Lint reported 0 errors/24 warnings (23 UnusedResources, one ObsoleteSdkInt).
+Both asset validators exited 0. Separate byte checks match all 56 originals / 940651
+bytes against the catalog, actual committed upstream `a31faf9` and production APK,
+with no extras; test APK assets: zero. Host tests are not asset or GPU proof.
+Binary manifests attest production `com.jamsmendez.cieldroid`, min35/target37, sole
+MainActivity launcher, no services or Internet/overlay/wallpaper permissions.
+AndroidX signature permission, startup provider and DUMP-protected receiver mean
+production is not permission-free; test `com.jamsmendez.cieldroid.test` targets the
+production package with AndroidJUnitRunner and REORDER_TASKS (min35/target37).
+Four actual JDK 25 daemon request/context pairs were attested, distinct from launcher
+26.0.2.1. Test APK compilation is not device execution; preDebugAndroidTestBuild
+SKIPPED in lint/test-APK and NO-SOURCE tasks are not JUnit skips.
+Initial strict audit passed; FINAL strict audit/acceptance FAILED exit 1: common `.git`
+root DIRECTORY and three existing object FILE mtimes only (objects `5e9ed1…`,
+`7f61df…`, `c7222b…`); file SHA and all size/mode/nlink values equal, writer UNKNOWN.
+All 114 candidate source/index entries, HEAD, seven staged paths, pure tree, raw indexes,
+future 11, six preservation backups and pre-existing `.atl` were unchanged. Parent-owned
+main-ledger interim edits were outside the candidate, not Git-writer attribution.
+Human selected `continue_c10_qualified_root_and_object_mtimes`: ONLY this C10 qualified
+continuation, not retroactive PASS, blanket future waiver, repairs, passing-check reruns
+or publishing. C05/C06a/I02/I03 historical qualifications remain; the final failed gate
+is preserved. C10 final input verification, native approval, exact acknowledgement,
+local commit and device acceptance remain PENDING; no UI/runtime integration is proved.
 Final UI documentation restoration belongs to C13/C14, not this slice.
 
 ## Scope and distribution limits

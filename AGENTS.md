@@ -34,6 +34,13 @@ The launcher stays catalog-only. Retain the qrc-only CSP at `idle/index.html:5`;
 static dependency closure is not runtime proof or Android compatibility.
 Future untracked files must survive; they are not verification for this slice.
 
+C10 adds secure URL policy/allowlist, served-only CSP and session readiness foundations
+with five test methods, not UI controls or runtime integration. Full is implicit,
+without a Mini selector; settings default to processing at 30 fps. URL policy does
+not enforce GET, no-network fallback, no JavaScript interface or WebView lifecycle;
+the future adapter must enforce these. Exact generation/source/both-marker readiness
+is not pixels/GPU proof. Keep original asset qrc CSPs, headers and license bytes intact.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.
@@ -131,7 +138,25 @@ were attested. Eight fresh host tests (seven functional) had no failures/errors/
 lint 0 errors/24 warnings. I03 strict audit exited 1 solely for common `.git` root
 directory mtime drift, writer unknown; 109 source/index entries and other Git metadata
 were unchanged. Human accepted candidate-specific qualified continuation, not a gate
-pass or blanket waiver; final input verification, native review and local commit are pending.
+pass or blanket waiver. Final input verification/native approval/exact acknowledgement
+(burned) and local commit closed at 195440b; I03 remains a failed historical gate.
+C10 controlled RED compiled successfully, then failed its sole fresh CSP test
+with ComparisonFailure (expected self, actual qrc) at SceneCoreTest.kt:20; strict audit passed.
+The fresh focused GREEN rerun passed one test, zero failures/errors/skips, including
+four scenes and malformed-CSP rejection assertions, not the full suite. Independent
+full C10 verification subsequently passed four offline checks, 13 fresh host tests
+(12 functional, one arithmetic; all five core methods; zero failures/errors/skips),
+both validators and exact 56-original/940651-byte catalog/committed-upstream/APK checks.
+README records task counts, lint 0 errors/24 warnings, manifests and four daemon-25 contexts.
+Initial strict audit passed, but FINAL strict audit/acceptance FAILED exit 1: common
+`.git` root DIRECTORY plus three existing object FILE mtimes only, equal file SHA and
+all size/mode/nlink values; writer UNKNOWN. Candidate 114 entries/index/HEAD/staged seven/
+pure tree/raw indexes/future 11/backups six/`.atl` were unchanged; parent-owned main-ledger
+edits outside the candidate are not Git attribution. Human accepted ONLY C10 qualified
+continuation (`continue_c10_qualified_root_and_object_mtimes`), not retroactive PASS,
+blanket waiver, repairs, passing-check reruns or publishing. C05/C06a/I02/I03 remain
+qualified. Final input verification/native approval/acknowledgement/local commit and
+device acceptance remain PENDING; host tests and readiness are not asset/pixels/GPU proof.
 Final UI documentation restoration remains C13/C14 work, not this slice.
 The arithmetic example is not functional.
 Build output and test APK assembly do not prove device behavior. Report failures
