@@ -1,44 +1,73 @@
 package com.jamsmendez.cieldroid.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jamsmendez.cieldroid.R
+import com.jamsmendez.cieldroid.domain.*
 
 @Composable
 fun CielDroidApp() {
+    val app = LocalContext.current.applicationContext
+    val factory = remember(app) { PreviewViewModel.factory(app) }
+    val vm: PreviewViewModel = viewModel(factory = factory)
+    val settings by vm.settings.collectAsStateWithLifecycle()
+    val writeError by vm.writeError.collectAsStateWithLifecycle()
+    var manuallyPaused by rememberSaveable { mutableStateOf(false) }
+    var retry by remember { mutableIntStateOf(0) }
+    val generation = remember(settings.loaded, settings.settings, retry) { vm.nextGeneration() }
+    val enabled = settings.loaded && settings.error == null
+
     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(padding)
-                .consumeWindowInsets(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+            Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)
+                .verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-            Text("Preview integration pending in this milestone.")
-            Text("Original scene catalog", style = MaterialTheme.typography.titleLarge)
-            listOf("processing", "explorer", "idle", "raphael").forEach { scene ->
-                Text(scene)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.semantics { heading() })
+            Text(stringResource(R.string.preview_title), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.validation_pending))
+            if (!settings.loaded) Text(stringResource(if (settings.error == null)
+                R.string.settings_loading else R.string.settings_read_error))
+            writeError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            Text(stringResource(R.string.scene_label), style = MaterialTheme.typography.titleMedium)
+            SceneId.entries.forEach { scene ->
+                FilterChip(
+                    selected = enabled && settings.settings.scene == scene,
+                    onClick = { vm.selectScene(scene) }, enabled = enabled,
+                    label = { Text(scene.assetId) }, modifier = Modifier.fillMaxWidth(),
+                )
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                PreviewFps.entries.forEach { fps ->
+                    FilterChip(selected = enabled && settings.settings.fps == fps,
+                        onClick = { vm.selectFps(fps) }, enabled = enabled,
+                        label = { Text(stringResource(R.string.fps_label, fps.value)) })
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(onClick = { manuallyPaused = !manuallyPaused }, enabled = enabled) {
+                    Text(stringResource(if (manuallyPaused) R.string.resume else R.string.pause))
+                }
+                OutlinedButton(onClick = { retry++ }, enabled = enabled) { Text(stringResource(R.string.retry)) }
+            }
+            if (enabled) key(generation) {
+                ScenePreview(settings.settings, generation, manuallyPaused)
+            }
+            Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.future_modes_explanation))
         }
     }
 }

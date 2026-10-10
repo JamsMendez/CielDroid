@@ -30,7 +30,7 @@ Its static 16-JS/CSS/shared-overlay/font closure is not execution or Android/GPU
 Preserve original bytes, CielWin headers, ordering and seeded RNG.
 Processing's static ten-JS/CSS/shared-overlay/font closure is not execution,
 GPU proof or Android compatibility; runtime integration awaits C13.
-The launcher stays catalog-only. Retain the qrc-only CSP at `idle/index.html:5`;
+Through C12 the launcher was catalog-only. Retain the qrc-only CSP at `idle/index.html:5`;
 static dependency closure is not runtime proof or Android compatibility.
 Future untracked files must survive; they are not verification for this slice.
 
@@ -50,21 +50,31 @@ checks passed. README records provenance, manifests, daemon evidence and I05 qua
 Initial strict audit passed; FINAL strict audit/acceptance FAILED exit 1 for common root
 DIRECTORY and three object FILE mtimes only, equal SHA/size/mode/nlink, UNKNOWN writer.
 Human accepted ONLY C11 qualified continuation; no retroactive PASS or future waiver.
-Native approval/exact acknowledgement (burned) and local commit closed at `fddae4c`; C13 UI pending;
-the launcher stays catalog-only and readiness is not pixels/GPU proof. Device gates remain pending.
+Native approval/exact acknowledgement (burned) and local commit closed at `fddae4c`; C13 later integrates the UI;
+readiness is not pixels/GPU proof. Device gates remain pending.
 
 C12 imports the unchanged compiled `WebViewSceneRuntime.kt` adapter (175 Kotlin lines):
 asset-loader-only GET serving with 403/500 denial and no network fallthrough, policy
 navigation blocking, TLS cancel, renderer-loss release, denied popups/permissions/
 file chooser/JS dialogs, no JavaScript interface and idempotent generation-gated release.
-It is not launcher-integrated; C13 UI and C14 docs/device gates remain. `androidx.webkit`
+C13 integrates it via ScenePreview; C14 docs/device gates remain. `androidx.webkit`
 1.13.0 was pinned in C02; no new dependencies or permissions. Independent C12 checks passed:
 four offline checks, 16 fresh host tests (15 functional), zero failures/errors/skips, lint
 0 errors/24 warnings, both validators and exact 56-original provenance. FINAL strict audit
 FAILED (I06): common `.git` root DIRECTORY mtime only, writer UNKNOWN; human accepted ONLY
-C12 qualified continuation. Native review/local commit pending; no adapter test or
-instrumentation ran.
+C12 qualified continuation. Native approval/exact acknowledgement (burned) and local
+commit closed at `7e205e8`; no adapter test or instrumentation ran.
 Nothing is proven on device; readiness is not pixels/GPU/WebGL/cadence/lifecycle proof.
+
+C13 integrates the launcher with ScenePreview, which owns one C11 controller and one
+C12 adapter per generation (scene/FPS, Pause/Resume, Retry). `BootstrapTest` replaces
+`ExampleInstrumentedTest`; it and `ScenePreviewTest` are compiled-only instrumentation,
+never executed on a device. Independent isolated C13 checks passed: four offline wrapper
+checks, 16 fresh host tests (15 functional), zero failures/errors/skips, lint 0 errors/8
+warnings; test APK packages both tests; production APK keeps 56 assets. Native review
+and local commit pending;
+`docs/architecture.md` is deferred to C14. Device, visual/GPU/WebGL, cadence,
+lifecycle and accessibility acceptance remain pending; readiness is not pixels proof.
 
 ## Change boundaries
 

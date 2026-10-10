@@ -45,7 +45,7 @@ Full is default; query or hash `variant=mini` selects Mini; query `fps=30`
 selects 30 fps, otherwise 60. Static closure covers 16 JS files, CSS and shared
 overlay/font; it is not execution, Android compatibility or GPU/visual proof.
 Preserve original bytes, CielWin headers, ordering and seeded RNG; runtime awaits C13.
-The launcher remains catalog-only: no controls, runtime or preview integration.
+At C08b the launcher was catalog-only: no controls, runtime or preview integration.
 The JavaScript's CielWin provenance header is preserved. The font's SIL OFL does
 not license the JavaScript; the vendor-component size exception applies only to
 these natural components, not native-code budgets or public JavaScript licensing.
@@ -58,7 +58,7 @@ closure is not dynamic runtime proof.
 C10 imports secure URL policy, a literal 56-path allowlist, served-only CSP adaptation
 and generation/source/both-marker session readiness foundations, with five test methods.
 Full remains implicit: no Mini selector; default settings are processing at 30 fps.
-The launcher is still catalog-only, with no UI controls or runtime integration.
+At C10 the launcher was still catalog-only, with no UI controls or runtime integration.
 URL policy alone does not enforce GET, no-network fallback, no JavaScript interface
 or WebView lifecycle: those are adapter responsibilities, compiled in C12. Readiness markers
 are not pixels/GPU proof. Original asset qrc CSPs, headers and license bytes stay intact.
@@ -70,12 +70,12 @@ visibility callback ordering. Independent full C11 verification passed all three
 controller methods within 16 fresh host tests (15 functional, one arithmetic), with
 zero failures/errors/skips. The qualified verification record below retains I05's
 failed final strict audit. Native approval/exact acknowledgement (burned) and local
-commit closed at `fddae4c`; C13's UI is not integrated. Readiness is not pixels/GPU proof.
+commit closed at `fddae4c`; C13 later integrates the UI. Readiness is not pixels/GPU proof.
 
 C12 imports the unchanged, compiled
 [WebView adapter](app/src/main/java/com/jamsmendez/cieldroid/scenes/WebViewSceneRuntime.kt)
-(175 Kotlin lines) for one owner generation. It is not launcher-integrated: C13 owns
-ScenePreview/UI wiring and C14 consolidated docs and device gates. `androidx.webkit`
+(175 Kotlin lines) for one owner generation. C13 integrates it into the launcher through
+ScenePreview; C14 owns consolidated docs and device gates. `androidx.webkit`
 1.13.0 was already pinned in C02; C12 adds no dependencies or permissions.
 
 | Concern | What the code enforces |
@@ -97,8 +97,23 @@ warning for `databaseEnabled` (`WebViewSceneRuntime.kt:58`). Both validators and
 56-original/940651-byte catalog/committed-upstream/APK checks passed; test APK assets: zero.
 FINAL strict audit FAILED (I06) for the common `.git` root DIRECTORY mtime only, writer
 UNKNOWN; human accepted ONLY C12 qualified continuation, not a retroactive PASS or waiver.
-Native review and local commit are pending. No adapter test or instrumentation was
-executed; nothing is proven on device. Readiness is not pixels proof; GPU/WebGL, cadence and lifecycle gates remain pending.
+Native approval/exact acknowledgement (burned) and local commit closed at `7e205e8`.
+No adapter test or instrumentation was executed; nothing is proven on device. Readiness is not pixels proof; GPU/WebGL, cadence and lifecycle gates remain pending.
+
+C13 integrates the launcher with the preview: the restored
+[launcher](app/src/main/java/com/jamsmendez/cieldroid/ui/CielDroidApp.kt) exposes
+persisted scene/FPS selection, Pause/Resume and Retry, and keys one
+[ScenePreview](app/src/main/java/com/jamsmendez/cieldroid/ui/ScenePreview.kt) per
+generation. ScenePreview owns one C11 `PreviewController` and one C12
+`WebViewSceneRuntime`, released on dispose. `BootstrapTest` replaces the template
+`ExampleInstrumentedTest`; it and `ScenePreviewTest` are instrumentation tests that are
+compiled only, with no device execution. Independent isolated C13 verification passed
+four offline wrapper checks (assemble 36 executed, forced host 24, lint 9/18, test APK
+30/20), 16 fresh host tests (15 functional) with zero failures/errors/skips and lint
+0 errors/8 warnings (7 UnusedResources, 1 ObsoleteSdkInt), none in C13 files. The test
+APK packages both tests; the production APK keeps 56 assets / 940651 bytes. Native
+review and local commit are pending. Architecture documentation is deferred to C14. Device, visual/GPU/WebGL,
+cadence, lifecycle and accessibility acceptance remain pending; readiness is not pixels proof.
 
 ## Build and verification
 
@@ -296,7 +311,7 @@ The source manifest requests no permissions or services. Public stability and
 publishing eligibility of the exact AGP/API versions remain unverified, as does
 distribution licensing for upstream scene JavaScript. No remote CI execution
 is established. CI pins four actions to researched immutable commits, retains JDK 25
-and the wrapper, and compiles the example instrumentation APK without device execution.
+and the wrapper, and compiles the instrumentation test APK without device execution.
 Google's published stable-channel SDK metadata confirms `android-37.0` revision 2
 and Build Tools 36.0.0; this is not remote execution or AGP compatibility proof.
 The Ubuntu 24.04 image still floats; Java/SDK/Gradle inputs are not fully immutable.
