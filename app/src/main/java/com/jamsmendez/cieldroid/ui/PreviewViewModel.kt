@@ -28,6 +28,10 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
     fun selectFps(fps: PreviewFps) = write(PREVIEW_ERROR) { repository.setFps(fps) }
     fun selectWallpaperScene(scene: SceneId) = write(WALLPAPER_ERROR) { repository.setWallpaperScene(scene) }
     fun selectWallpaperFps(fps: PreviewFps) = write(WALLPAPER_ERROR) { repository.setWallpaperFps(fps) }
+    fun selectOverlayScene(scene: SceneId) = write(OVERLAY_ERROR) { repository.setOverlayScene(scene) }
+    fun selectOverlayFps(fps: PreviewFps) = write(OVERLAY_ERROR) { repository.setOverlayFps(fps) }
+
+    fun setOverlayMoveMode(enabled: Boolean) = write(OVERLAY_ERROR) { repository.setOverlayMoveMode(enabled) }
 
     private fun write(errorMessage: String, update: suspend () -> Unit) {
         if (!settings.value.loaded || settings.value.error != null) return
@@ -42,6 +46,7 @@ class PreviewViewModel(createRepository: (CoroutineScope) -> SettingsRepository)
 
     companion object {
         private const val PREVIEW_ERROR = "Could not save preview settings. Try selecting again."
+        private const val OVERLAY_ERROR = "Could not save overlay settings. Try again."
         private const val WALLPAPER_ERROR = "Could not save wallpaper settings. Try selecting again."
 
         fun factory(context: Context): ViewModelProvider.Factory {

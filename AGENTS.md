@@ -136,6 +136,24 @@ content descriptions, so text-based preview tests stay unambiguous. "Set as wall
 `onSurfaceCreated` (the holder reuses one `Surface` object, so identity never changed). Limits:
 fps 12.6/30 measured once for idle; energy, landscape, processing/60 unmeasured; single device.
 
+O01 (user-authorized `SYSTEM_ALERT_WINDOW`, granted manually by the user; never via appops/pm):
+`SceneVariant` (FULL default, never persisted); `ScenePolicy` entry queries are exactly `fps=30|60`
+or `fps=30|60&variant=mini`. `assets/adaptations/mini-transparent.css` is a separate non-original
+adaptation (`SceneAdaptations`, outside the 56-original `SceneAssets` inventory and the verifier's
+`scenes/` scan); `SceneHtml` links it only for MINI. `overlay/MiniOverlayService` is a plain started
+service (no foreground service) owning one touch-through `TYPE_APPLICATION_OVERLAY` window with a
+transparent WebView generation (wallpaper scene/FPS, MINI), paused on screen off. `MiniTransparencyTest`
+proves alpha off-screen only; the overlay window itself is unverified until the user grants the permission.
+O03a: `OverlayPlacement` sizes the WebView at 0.42 × short side inside a 0.95-cropped window
+(4 dp default top-end margin below the status bar; absolute TOP|START coordinates with no inset fitting).
+Persisted `overlay_move_mode` (default on since O03e) and `overlay_x`/`overlay_y`; move mode clears
+FLAG_NOT_TOUCHABLE live and `OverlayFrame` intercepts every touch to drag (clamped, saved on UP/CANCEL),
+so the WebView never gets input. Off = pass-through. Drag/persist/pass-through verified once on device (moto g84).
+O03d: independent `overlay_scene`/`overlay_fps` keys (default idle/30; unset or invalid never falls back to the
+wallpaper) in `OverlaySettings.content`; `OverlaySection` chips `overlay-scene-<id>` / `overlay-fps-<n>` mirror
+W04b ("Overlay scene <id>" / "Overlay <n> FPS"). The service follows them (always MINI) and rebuilds only on
+scene/FPS change, not move mode or position; wallpaper keys no longer affect it. `OverlaySectionTest` is compiled only.
+
 ## Change boundaries
 
 - Preserve `com.jamsmendez.cieldroid`, Android 15 / minSdk 35 and original assets.

@@ -17,7 +17,7 @@ class BootstrapTest {
         compose.onNodeWithText("Original FULL scene preview").assertIsDisplayed()
         compose.onNodeWithText("Device validation pending. Readiness is not proof of visual fidelity.").assertIsDisplayed()
         listOf("processing", "explorer", "idle", "raphael", "30 FPS", "60 FPS", "Live wallpaper", "Set as wallpaper",
-            "Future modes unavailable").forEach {
+            "Floating mini scene", "Future modes unavailable").forEach {
             compose.onNodeWithText(it).performScrollTo().assertIsDisplayed()
         }
     }

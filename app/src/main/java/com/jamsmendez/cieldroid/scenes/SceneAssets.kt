@@ -63,3 +63,11 @@ object SceneAssets {
         "scenes/shared/js/alert-overlay.js",
     ))
 }
+
+/** Separate host adaptations served beside the originals; never part of the original inventory. */
+object SceneAdaptations {
+    const val MINI_TRANSPARENT = "adaptations/mini-transparent.css"
+    val paths: Set<String> = Collections.unmodifiableSet(setOf(MINI_TRANSPARENT))
+    /** Everything the asset loader may serve. */
+    val served: Set<String> = Collections.unmodifiableSet(SceneAssets.paths + paths)
+}

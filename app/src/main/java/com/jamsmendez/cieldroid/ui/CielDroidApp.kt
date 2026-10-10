@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jamsmendez.cieldroid.R
@@ -29,6 +30,13 @@ fun CielDroidApp() {
     var manuallyPaused by rememberSaveable { mutableStateOf(false) }
     var retry by remember { mutableIntStateOf(0) }
     var pickerUnavailable by rememberSaveable { mutableStateOf(false) }
+    var overlayGranted by remember { mutableStateOf(context.canDrawOverlays()) }
+    var overlaySettingsUnavailable by rememberSaveable { mutableStateOf(false) }
+    // The user grants the permission in system settings; re-check whenever the launcher resumes.
+    LifecycleResumeEffect(Unit) {
+        overlayGranted = context.canDrawOverlays()
+        onPauseOrDispose { }
+    }
     val generation = remember(settings.loaded, settings.settings, retry) { vm.nextGeneration() }
     val enabled = settings.loaded && settings.error == null
 
@@ -77,6 +85,16 @@ fun CielDroidApp() {
                 wallpaper = settings.wallpaper, enabled = enabled, pickerUnavailable = pickerUnavailable,
                 onSceneSelected = vm::selectWallpaperScene, onFpsSelected = vm::selectWallpaperFps,
                 onSetWallpaper = { pickerUnavailable = !context.openLiveWallpaperPicker() },
+            )
+            OverlaySection(
+                content = settings.overlay.content, contentEnabled = enabled,
+                onSceneSelected = vm::selectOverlayScene, onFpsSelected = vm::selectOverlayFps,
+                granted = overlayGranted, settingsUnavailable = overlaySettingsUnavailable,
+                moveMode = settings.overlay.moveMode, moveModeEnabled = enabled,
+                onMoveModeChange = vm::setOverlayMoveMode,
+                onGrant = { overlaySettingsUnavailable = !context.openOverlayPermissionSettings() },
+                onStart = { if (context.canDrawOverlays()) context.startMiniOverlay() else overlayGranted = false },
+                onStop = { context.stopMiniOverlay() },
             )
             Text(stringResource(R.string.future_modes), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() })

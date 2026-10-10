@@ -190,6 +190,28 @@ recreated wallpaper surface is now detected from `onSurfaceCreated`, because the
 `Surface` object. Honest limits: one measurement of the idle scene showed about 12.6 of 30 fps;
 energy, landscape and processing at 60 fps are unmeasured; single device (moto g84).
 
+O01 adds a "Floating mini scene" prototype with your authorization for "Display over other apps"
+(`SYSTEM_ALERT_WINDOW`). You grant it yourself: "Grant overlay permission" opens the system screen.
+Once granted, "Start mini scene" shows the mini ring of the wallpaper scene/FPS in a small square at
+the top end of the screen; touches pass through it, and it pauses while the screen is off. Transparency
+comes from a separate adaptation stylesheet (`assets/adaptations/mini-transparent.css`); the 56
+originals are unchanged. Limits: plain service without a foreground notification (the system may stop
+it); dark ring bases look stronger than the Linux luminance key; fps and energy unmeasured; one device.
+
+O03a: the scene WebView is 0.42 × the screen short side; the window is 0.95 of that (only the
+outermost edge fade is cropped; the ring disc stays whole) and defaults to the top end, 4 dp
+from the edge below the status bar. "Move mode" (on by default) makes the ring draggable and blocks
+touches under it; turn it off to let touches pass through again. The window position
+(`overlay_x`/`overlay_y`, absolute pixels) and the switch (`overlay_move_mode`) persist in the shared
+settings store; the position is restored on start. Clamping it to the screen (on start or a screen-size
+change) is display-only and never persisted, so rotating back restores the original spot; only a real
+drag persists a new position.
+
+O03d: the floating mini scene has its own scene and FPS chips, independent of the live wallpaper
+(`overlay_scene`/`overlay_fps` in the shared settings store, default idle at 30 fps). A running overlay
+rebuilds its scene when you change them; move mode and the saved position do not rebuild it. Not yet
+checked on device; `OverlaySectionTest` is compiled, not executed.
+
 ## Build and verification
 
 Use the checked-in wrapper and installed SDK package `platforms;android-37.0` / Build Tools 36.0.0.

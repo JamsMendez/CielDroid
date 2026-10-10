@@ -170,4 +170,159 @@ class PreferencesSettingsRepositoryTest {
         assertEquals(PreviewSettings(), repo.state.value.settings)
         assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
     }
+
+    @Test fun overlayMoveModeAndPositionPersistIndependentlyWithValidatedDefaults() = runTest {
+        val file = testFile()
+        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        try {
+            val repo = PreferencesSettingsRepository(store, scope)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(moveMode = true, position = null), repo.state.value.overlay)
+            repo.setOverlayMoveMode(true)
+            repo.setOverlayPosition(OverlayPosition(120, 340))
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
+            assertEquals(PreviewSettings(), repo.state.value.settings)
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            val stored = store.updateData { it }
+            assertEquals(true, stored[booleanPreferencesKey("overlay_move_mode")])
+            assertEquals(120, stored[intPreferencesKey("overlay_x")])
+            assertEquals(340, stored[intPreferencesKey("overlay_y")])
+            repo.setWallpaperScene(SceneId.RAPHAEL)
+            repo.setScene(SceneId.EXPLORER)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
+            repo.setOverlayMoveMode(false)
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(false, OverlayPosition(120, 340)), repo.state.value.overlay)
+            assertEquals(SceneId.RAPHAEL, repo.state.value.wallpaper.scene)
+            // Wrong types, negatives and half-written positions fall back to the defaults.
+            store.edit {
+                it.remove(booleanPreferencesKey("overlay_move_mode"))
+                it[stringPreferencesKey("overlay_move_mode")] = "true"
+                it[intPreferencesKey("overlay_x")] = -5
+            }
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(), repo.state.value.overlay)
+            store.edit {
+                it.remove(intPreferencesKey("overlay_x"))
+                it[stringPreferencesKey("overlay_x")] = "10"
+            }
+            advanceUntilIdle()
+            assertEquals(OverlaySettings(), repo.state.value.overlay)
+            store.edit { it.remove(stringPreferencesKey("overlay_x")) }
+            advanceUntilIdle()
+            assertNull(repo.state.value.overlay.position)
+            assertNull(repo.state.value.error)
+            assertEquals(SceneId.EXPLORER, repo.state.value.settings.scene)
+        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
+    }
+
+    @Test fun overlayWriteFailuresPropagateWithoutOptimisticState() = runTest {
+        val failure = IOException("write denied")
+        val store = object : DataStore<Preferences> {
+            override val data: Flow<Preferences> = flow { emit(emptyPreferences()) }
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences = throw failure
+        }
+        val repo = PreferencesSettingsRepository(store, backgroundScope)
+        runCurrent()
+        try { repo.setOverlayMoveMode(true); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        try { repo.setOverlayPosition(OverlayPosition(1, 2)); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        runCurrent()
+        assertEquals(OverlaySettings(), repo.state.value.overlay)
+    }
+
+    @Test fun overlaySceneAndFpsDefaultToIdleThirtyAndAreIndependentOfWallpaper() = runTest {
+        val file = testFile()
+        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        try {
+            // A stored wallpaper choice must not leak into an unset overlay: unset means the overlay default.
+            store.edit {
+                it[stringPreferencesKey("wallpaper_scene")] = "raphael"
+                it[intPreferencesKey("wallpaper_fps")] = 60
+            }
+            val repo = PreferencesSettingsRepository(store, scope)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY), repo.state.value.overlay.content)
+            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
+            repo.setOverlayScene(SceneId.EXPLORER)
+            repo.setOverlayFps(PreviewFps.SIXTY)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.overlay.content)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
+            assertEquals(PreviewSettings(), repo.state.value.settings)
+            val stored = store.updateData { it }
+            assertEquals("explorer", stored[stringPreferencesKey("overlay_scene")])
+            assertEquals(60, stored[intPreferencesKey("overlay_fps")])
+            // Wallpaper writes leave the overlay alone, and overlay writes leave the wallpaper alone.
+            repo.setWallpaperScene(SceneId.PROCESSING)
+            repo.setWallpaperFps(PreviewFps.THIRTY)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.overlay.content)
+            repo.setOverlayScene(SceneId.RAPHAEL)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.THIRTY), repo.state.value.wallpaper)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.overlay.content)
+            // Move mode and position stay independent of the overlay scene/FPS.
+            repo.setOverlayMoveMode(true)
+            repo.setOverlayPosition(OverlayPosition(7, 9))
+            advanceUntilIdle()
+            assertEquals(
+                OverlaySettings(true, OverlayPosition(7, 9), PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY)),
+                repo.state.value.overlay,
+            )
+            // Unknown values and wrong types fall back to the overlay default, not the wallpaper value.
+            store.edit {
+                it[stringPreferencesKey("overlay_scene")] = "../unknown"
+                it[intPreferencesKey("overlay_fps")] = 45
+            }
+            advanceUntilIdle()
+            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
+            store.edit {
+                it.remove(stringPreferencesKey("overlay_scene"))
+                it.remove(intPreferencesKey("overlay_fps"))
+                it[intPreferencesKey("overlay_scene")] = 1
+                it[stringPreferencesKey("overlay_fps")] = "60"
+            }
+            advanceUntilIdle()
+            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
+            assertEquals(OverlaySettings(true, OverlayPosition(7, 9)), repo.state.value.overlay)
+            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.THIRTY), repo.state.value.wallpaper)
+            assertNull(repo.state.value.error)
+        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
+        // The overlay choice survives reopening the actual file.
+        val reopenedScope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val reopened = PreferenceDataStoreFactory.create(scope = reopenedScope, produceFile = { file })
+        try {
+            reopened.edit {
+                it.remove(intPreferencesKey("overlay_scene"))
+                it.remove(stringPreferencesKey("overlay_fps"))
+                it[stringPreferencesKey("overlay_scene")] = "processing"
+                it[intPreferencesKey("overlay_fps")] = 60
+            }
+            val repo = PreferencesSettingsRepository(reopened, reopenedScope)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.SIXTY), repo.state.value.overlay.content)
+        } finally { reopenedScope.coroutineContext[Job]!!.cancelAndJoin() }
+    }
+
+    @Test fun overlaySceneAndFpsWriteFailuresPropagateWithoutOptimisticState() = runTest {
+        val failure = IOException("write denied")
+        val store = object : DataStore<Preferences> {
+            override val data: Flow<Preferences> = flow { emit(emptyPreferences()) }
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences = throw failure
+        }
+        val repo = PreferencesSettingsRepository(store, backgroundScope)
+        runCurrent()
+        try { repo.setOverlayScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        try { repo.setOverlayFps(PreviewFps.SIXTY); fail("Must propagate write failure") }
+        catch (e: IOException) { assertSame(failure, e) }
+        runCurrent()
+        assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
+    }
 }

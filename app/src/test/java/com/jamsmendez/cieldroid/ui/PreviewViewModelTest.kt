@@ -34,6 +34,26 @@ class PreviewViewModelTest {
             if (fail) error("disk unavailable")
             state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(fps = fps))
         }
+        override suspend fun setOverlayScene(scene: SceneId) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(content = state.value.overlay.content.copy(scene = scene)))
+        }
+        override suspend fun setOverlayFps(fps: PreviewFps) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(content = state.value.overlay.content.copy(fps = fps)))
+        }
+        override suspend fun setOverlayMoveMode(enabled: Boolean) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(moveMode = enabled))
+        }
+        override suspend fun setOverlayPosition(position: OverlayPosition) {
+            writes++
+            if (fail) error("disk unavailable")
+            state.value = state.value.copy(overlay = state.value.overlay.copy(position = position))
+        }
     }
     @Test fun notLoadedCannotWriteAndFailedWriteIsNotAcknowledged() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
@@ -85,6 +105,68 @@ class PreviewViewModelTest {
             vm.selectWallpaperFps(PreviewFps.THIRTY)
             runCurrent()
             assertEquals(3, repo.writes) // a read error blocks wallpaper writes too
+        } finally { Dispatchers.resetMain() }
+    }
+
+    @Test fun overlayMoveModeToggleIsGatedAndFailuresAreReported() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val repo = Repository()
+            val vm = PreviewViewModel(repo)
+            vm.setOverlayMoveMode(true)
+            runCurrent()
+            assertEquals(0, repo.writes)
+            repo.state.value = SettingsState(loaded = true)
+            vm.setOverlayMoveMode(true)
+            runCurrent()
+            assertTrue(vm.settings.value.overlay.moveMode)
+            assertNull(vm.settings.value.overlay.position) // the overlay service owns the position, not the VM
+            assertEquals(PreviewSettings(), vm.settings.value.settings)
+            repo.fail = true
+            vm.setOverlayMoveMode(false)
+            runCurrent()
+            assertTrue(vm.settings.value.overlay.moveMode)
+            assertNotNull(vm.writeError.value)
+            repo.fail = false
+            vm.setOverlayMoveMode(false)
+            runCurrent()
+            assertFalse(vm.settings.value.overlay.moveMode)
+            assertNull(vm.writeError.value)
+            assertEquals(3, repo.writes) // the gated first call never wrote
+        } finally { Dispatchers.resetMain() }
+    }
+
+    @Test fun overlaySceneAndFpsSelectionIsGatedAndIndependentOfWallpaper() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val repo = Repository()
+            val vm = PreviewViewModel(repo)
+            vm.selectOverlayScene(SceneId.RAPHAEL)
+            runCurrent()
+            assertEquals(0, repo.writes)
+            repo.state.value = SettingsState(loaded = true)
+            vm.selectOverlayScene(SceneId.RAPHAEL)
+            vm.selectOverlayFps(PreviewFps.SIXTY)
+            runCurrent()
+            assertEquals(2, repo.writes)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.overlay.content)
+            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, vm.settings.value.wallpaper)
+            assertEquals(PreviewSettings(), vm.settings.value.settings)
+            assertTrue(vm.settings.value.overlay.moveMode) // scene/FPS writes leave the default move mode
+            repo.fail = true
+            vm.selectOverlayFps(PreviewFps.THIRTY)
+            runCurrent()
+            assertEquals(PreviewFps.SIXTY, vm.settings.value.overlay.content.fps)
+            assertNotNull(vm.writeError.value)
+            repo.fail = false
+            vm.selectOverlayScene(SceneId.EXPLORER)
+            runCurrent()
+            assertEquals(SceneId.EXPLORER, vm.settings.value.overlay.content.scene)
+            assertNull(vm.writeError.value)
+            repo.state.value = repo.state.value.copy(error = IllegalStateException("read failed"))
+            vm.selectOverlayFps(PreviewFps.THIRTY)
+            runCurrent()
+            assertEquals(4, repo.writes) // a read error blocks overlay writes too
         } finally { Dispatchers.resetMain() }
     }
 }
