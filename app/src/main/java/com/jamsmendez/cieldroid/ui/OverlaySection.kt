@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -17,21 +16,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.jamsmendez.cieldroid.R
-import com.jamsmendez.cieldroid.domain.PreviewFps
-import com.jamsmendez.cieldroid.domain.PreviewSettings
-import com.jamsmendez.cieldroid.domain.SceneId
 import com.jamsmendez.cieldroid.overlay.MiniOverlayService
 
 /**
- * Stateless overlay controls; the caller re-checks [granted] on every resume. Scene/FPS live in a selector
- * opened from one summary row, like the wallpaper section, so only the preview shows a visible chip set.
+ * Stateless Mini mode controls; the caller re-checks [granted] and [wallpaperActive] on every resume.
+ * The overlay follows the preview's shared scene/FPS. When CielDroid's live wallpaper is still active, a
+ * notice offers the system wallpaper chooser; the app itself never clears the wallpaper.
  */
 @Composable
-fun OverlaySection(
-    content: PreviewSettings,
-    contentEnabled: Boolean,
-    onSceneSelected: (SceneId) -> Unit,
-    onFpsSelected: (PreviewFps) -> Unit,
+fun MiniControls(
     granted: Boolean,
     settingsUnavailable: Boolean,
     moveMode: Boolean,
@@ -40,53 +33,51 @@ fun OverlaySection(
     onGrant: () -> Unit,
     onStart: () -> Unit,
     onStop: () -> Unit,
-    modifier: Modifier = Modifier,
+    wallpaperActive: Boolean,
+    chooserUnavailable: Boolean,
+    onChangeWallpaper: () -> Unit,
 ) {
-    var selecting by rememberSaveable { mutableStateOf(false) }
-    SectionCard(R.string.overlay_title, modifier) {
-        Text(stringResource(R.string.overlay_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        SelectionSummaryRow(content, contentEnabled, onClick = { selecting = true }, Modifier.testTag("overlay-content"))
-        if (granted) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = onStart, modifier = Modifier.testTag("overlay-start")) {
-                    Text(stringResource(R.string.overlay_start))
-                }
-                OutlinedButton(onClick = onStop, modifier = Modifier.testTag("overlay-stop")) {
-                    Text(stringResource(R.string.overlay_stop))
-                }
+    Text(stringResource(R.string.overlay_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    if (granted) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(onClick = onStart, modifier = Modifier.testTag("overlay-start")) {
+                Text(stringResource(R.string.overlay_start))
             }
-        } else {
-            Text(stringResource(R.string.overlay_permission_missing), style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Button(onClick = onGrant, modifier = Modifier.testTag("overlay-grant")) {
-                Text(stringResource(R.string.overlay_grant))
+            OutlinedButton(onClick = onStop, modifier = Modifier.testTag("overlay-stop")) {
+                Text(stringResource(R.string.overlay_stop))
             }
         }
-        // One toggleable row: the label is the switch's accessible name and the whole row is the touch target.
-        Row(
-            Modifier.fillMaxWidth().testTag("overlay-move-mode")
-                .toggleable(moveMode, enabled = moveModeEnabled, role = Role.Switch, onValueChange = onMoveModeChange),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.overlay_move_mode))
-                Text(stringResource(R.string.overlay_move_mode_explanation), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Switch(checked = moveMode, onCheckedChange = null, enabled = moveModeEnabled)
-        }
-        if (settingsUnavailable) {
-            Text(stringResource(R.string.overlay_settings_unavailable), color = MaterialTheme.colorScheme.error)
+    } else {
+        Text(stringResource(R.string.overlay_permission_missing), style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Button(onClick = onGrant, modifier = Modifier.testTag("overlay-grant")) {
+            Text(stringResource(R.string.overlay_grant))
         }
     }
-    if (selecting && contentEnabled) {
-        SceneSelectorDialog(
-            tagPrefix = "overlay", title = R.string.overlay_selector_title,
-            sceneDescription = R.string.overlay_scene_chip_description,
-            fpsDescription = R.string.overlay_fps_chip_description,
-            settings = content, onSceneSelected = onSceneSelected, onFpsSelected = onFpsSelected,
-            onDismiss = { selecting = false },
-        )
+    // One toggleable row: the label is the switch's accessible name and the whole row is the touch target.
+    Row(
+        Modifier.fillMaxWidth().testTag("overlay-move-mode")
+            .toggleable(moveMode, enabled = moveModeEnabled, role = Role.Switch, onValueChange = onMoveModeChange),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.overlay_move_mode))
+            Text(stringResource(R.string.overlay_move_mode_explanation), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = moveMode, onCheckedChange = null, enabled = moveModeEnabled)
+    }
+    if (settingsUnavailable) {
+        Text(stringResource(R.string.overlay_settings_unavailable), color = MaterialTheme.colorScheme.error)
+    }
+    if (wallpaperActive) {
+        Text(stringResource(R.string.wallpaper_still_active))
+        OutlinedButton(onClick = onChangeWallpaper, modifier = Modifier.testTag("wallpaper-change")) {
+            Text(stringResource(R.string.wallpaper_change))
+        }
+        if (chooserUnavailable) {
+            Text(stringResource(R.string.wallpaper_chooser_unavailable), color = MaterialTheme.colorScheme.error)
+        }
     }
 }
 

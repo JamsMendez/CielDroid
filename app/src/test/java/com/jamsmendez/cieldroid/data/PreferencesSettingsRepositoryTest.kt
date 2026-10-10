@@ -77,47 +77,85 @@ class PreferencesSettingsRepositoryTest {
         } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
     }
 
-    @Test fun wallpaperKeysAreIndependentOfPreviewKeys() = runTest {
+    @Test fun activeModeDefaultsToWallpaperRoundTripsAndRejectsInvalidValues() = runTest {
         val file = testFile()
         val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
         val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
         try {
             val repo = PreferencesSettingsRepository(store, scope)
             advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY), repo.state.value.wallpaper)
-            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
-            repo.setWallpaperScene(SceneId.RAPHAEL)
-            repo.setWallpaperFps(PreviewFps.SIXTY)
+            assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
+            repo.setActiveMode(ActiveMode.MINI)
             advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
+            assertEquals(ActiveMode.MINI, repo.state.value.mode)
+            assertEquals("mini", store.updateData { it }[stringPreferencesKey("active_mode")])
+            // The mode is independent of the shared scene/FPS config.
             assertEquals(PreviewSettings(), repo.state.value.settings)
+            repo.setScene(SceneId.RAPHAEL)
+            advanceUntilIdle()
+            assertEquals(ActiveMode.MINI, repo.state.value.mode)
+            repo.setActiveMode(ActiveMode.WALLPAPER)
+            advanceUntilIdle()
+            assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
+            assertEquals("wallpaper", store.updateData { it }[stringPreferencesKey("active_mode")])
+            assertEquals(SceneId.RAPHAEL, repo.state.value.settings.scene)
+            // Unknown values and wrong types mean the default, never an error.
+            store.edit { it[stringPreferencesKey("active_mode")] = "MINI" }
+            advanceUntilIdle()
+            assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
+            store.edit {
+                it.remove(stringPreferencesKey("active_mode"))
+                it[intPreferencesKey("active_mode")] = 1
+            }
+            advanceUntilIdle()
+            assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
+            assertNull(repo.state.value.error)
+            store.edit {
+                it.remove(intPreferencesKey("active_mode"))
+                it[stringPreferencesKey("active_mode")] = "mini"
+            }
+            advanceUntilIdle()
+            assertEquals(ActiveMode.MINI, repo.state.value.mode)
+        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
+        // The mode survives reopening the actual file.
+        val reopenedScope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val reopened = PreferenceDataStoreFactory.create(scope = reopenedScope, produceFile = { file })
+        try {
+            val repo = PreferencesSettingsRepository(reopened, reopenedScope)
+            advanceUntilIdle()
+            assertEquals(ActiveMode.MINI, repo.state.value.mode)
+        } finally { reopenedScope.coroutineContext[Job]!!.cancelAndJoin() }
+    }
+
+    @Test fun legacyWallpaperAndOverlayKeysAreIgnoredAndLeftInPlace() = runTest {
+        val file = testFile()
+        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
+        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        try {
+            store.edit {
+                it[stringPreferencesKey("wallpaper_scene")] = "raphael"
+                it[intPreferencesKey("wallpaper_fps")] = 60
+                it[stringPreferencesKey("overlay_scene")] = "explorer"
+                it[intPreferencesKey("overlay_fps")] = 60
+            }
+            val repo = PreferencesSettingsRepository(store, scope)
+            advanceUntilIdle()
+            // Stored per-surface choices never leak into the one shared config.
+            assertEquals(PreviewSettings(), repo.state.value.settings)
+            repo.setScene(SceneId.IDLE)
+            repo.setFps(PreviewFps.SIXTY)
+            repo.setActiveMode(ActiveMode.MINI)
+            repo.setOverlayMoveMode(false)
+            advanceUntilIdle()
+            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.SIXTY), repo.state.value.settings)
+            // No migration or deletion: the legacy keys stay exactly as they were.
             val stored = store.updateData { it }
             assertEquals("raphael", stored[stringPreferencesKey("wallpaper_scene")])
             assertEquals(60, stored[intPreferencesKey("wallpaper_fps")])
-            assertNull(stored[stringPreferencesKey("preview_scene")])
-            assertNull(stored[intPreferencesKey("preview_fps")])
-            repo.setScene(SceneId.EXPLORER)
-            repo.setFps(PreviewFps.SIXTY)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.settings)
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
-            // Unknown values and wrong types fall back to the wallpaper default, not the preview one.
-            store.edit {
-                it[stringPreferencesKey("wallpaper_scene")] = "../unknown"
-                it[intPreferencesKey("wallpaper_fps")] = 45
-            }
-            advanceUntilIdle()
-            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
-            store.edit {
-                it.remove(stringPreferencesKey("wallpaper_scene"))
-                it.remove(intPreferencesKey("wallpaper_fps"))
-                it[intPreferencesKey("wallpaper_scene")] = 1
-                it[stringPreferencesKey("wallpaper_fps")] = "60"
-            }
-            advanceUntilIdle()
-            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
-            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.settings)
-            assertNull(repo.state.value.error)
+            assertEquals("explorer", stored[stringPreferencesKey("overlay_scene")])
+            assertEquals(60, stored[intPreferencesKey("overlay_fps")])
+            assertEquals("idle", stored[stringPreferencesKey("preview_scene")])
+            assertEquals(60, stored[intPreferencesKey("preview_fps")])
         } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
     }
 
@@ -163,12 +201,10 @@ class PreferencesSettingsRepositoryTest {
         catch (e: IOException) { assertSame(failure, e) }
         try { repo.setScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
         catch (e: IOException) { assertSame(failure, e) }
-        try { repo.setWallpaperScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
-        catch (e: IOException) { assertSame(failure, e) }
-        try { repo.setWallpaperFps(PreviewFps.SIXTY); fail("Must propagate write failure") }
+        try { repo.setActiveMode(ActiveMode.MINI); fail("Must propagate write failure") }
         catch (e: IOException) { assertSame(failure, e) }
         assertEquals(PreviewSettings(), repo.state.value.settings)
-        assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+        assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
     }
 
     @Test fun overlayMoveModeAndPositionPersistIndependentlyWithValidatedDefaults() = runTest {
@@ -184,19 +220,19 @@ class PreferencesSettingsRepositoryTest {
             advanceUntilIdle()
             assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
             assertEquals(PreviewSettings(), repo.state.value.settings)
-            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, repo.state.value.wallpaper)
+            assertEquals(ActiveMode.WALLPAPER, repo.state.value.mode)
             val stored = store.updateData { it }
             assertEquals(true, stored[booleanPreferencesKey("overlay_move_mode")])
             assertEquals(120, stored[intPreferencesKey("overlay_x")])
             assertEquals(340, stored[intPreferencesKey("overlay_y")])
-            repo.setWallpaperScene(SceneId.RAPHAEL)
+            repo.setActiveMode(ActiveMode.MINI)
             repo.setScene(SceneId.EXPLORER)
             advanceUntilIdle()
             assertEquals(OverlaySettings(true, OverlayPosition(120, 340)), repo.state.value.overlay)
             repo.setOverlayMoveMode(false)
             advanceUntilIdle()
             assertEquals(OverlaySettings(false, OverlayPosition(120, 340)), repo.state.value.overlay)
-            assertEquals(SceneId.RAPHAEL, repo.state.value.wallpaper.scene)
+            assertEquals(ActiveMode.MINI, repo.state.value.mode)
             // Wrong types, negatives and half-written positions fall back to the defaults.
             store.edit {
                 it.remove(booleanPreferencesKey("overlay_move_mode"))
@@ -233,96 +269,5 @@ class PreferencesSettingsRepositoryTest {
         catch (e: IOException) { assertSame(failure, e) }
         runCurrent()
         assertEquals(OverlaySettings(), repo.state.value.overlay)
-    }
-
-    @Test fun overlaySceneAndFpsDefaultToIdleThirtyAndAreIndependentOfWallpaper() = runTest {
-        val file = testFile()
-        val scope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
-        val store = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
-        try {
-            // A stored wallpaper choice must not leak into an unset overlay: unset means the overlay default.
-            store.edit {
-                it[stringPreferencesKey("wallpaper_scene")] = "raphael"
-                it[intPreferencesKey("wallpaper_fps")] = 60
-            }
-            val repo = PreferencesSettingsRepository(store, scope)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.THIRTY), repo.state.value.overlay.content)
-            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
-            repo.setOverlayScene(SceneId.EXPLORER)
-            repo.setOverlayFps(PreviewFps.SIXTY)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.overlay.content)
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.wallpaper)
-            assertEquals(PreviewSettings(), repo.state.value.settings)
-            val stored = store.updateData { it }
-            assertEquals("explorer", stored[stringPreferencesKey("overlay_scene")])
-            assertEquals(60, stored[intPreferencesKey("overlay_fps")])
-            // Wallpaper writes leave the overlay alone, and overlay writes leave the wallpaper alone.
-            repo.setWallpaperScene(SceneId.PROCESSING)
-            repo.setWallpaperFps(PreviewFps.THIRTY)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.EXPLORER, PreviewFps.SIXTY), repo.state.value.overlay.content)
-            repo.setOverlayScene(SceneId.RAPHAEL)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.THIRTY), repo.state.value.wallpaper)
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), repo.state.value.overlay.content)
-            // Move mode and position stay independent of the overlay scene/FPS.
-            repo.setOverlayMoveMode(true)
-            repo.setOverlayPosition(OverlayPosition(7, 9))
-            advanceUntilIdle()
-            assertEquals(
-                OverlaySettings(true, OverlayPosition(7, 9), PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY)),
-                repo.state.value.overlay,
-            )
-            // Unknown values and wrong types fall back to the overlay default, not the wallpaper value.
-            store.edit {
-                it[stringPreferencesKey("overlay_scene")] = "../unknown"
-                it[intPreferencesKey("overlay_fps")] = 45
-            }
-            advanceUntilIdle()
-            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
-            store.edit {
-                it.remove(stringPreferencesKey("overlay_scene"))
-                it.remove(intPreferencesKey("overlay_fps"))
-                it[intPreferencesKey("overlay_scene")] = 1
-                it[stringPreferencesKey("overlay_fps")] = "60"
-            }
-            advanceUntilIdle()
-            assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
-            assertEquals(OverlaySettings(true, OverlayPosition(7, 9)), repo.state.value.overlay)
-            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.THIRTY), repo.state.value.wallpaper)
-            assertNull(repo.state.value.error)
-        } finally { scope.coroutineContext[Job]!!.cancelAndJoin() }
-        // The overlay choice survives reopening the actual file.
-        val reopenedScope = CoroutineScope(SupervisorJob() + StandardTestDispatcher(testScheduler))
-        val reopened = PreferenceDataStoreFactory.create(scope = reopenedScope, produceFile = { file })
-        try {
-            reopened.edit {
-                it.remove(intPreferencesKey("overlay_scene"))
-                it.remove(stringPreferencesKey("overlay_fps"))
-                it[stringPreferencesKey("overlay_scene")] = "processing"
-                it[intPreferencesKey("overlay_fps")] = 60
-            }
-            val repo = PreferencesSettingsRepository(reopened, reopenedScope)
-            advanceUntilIdle()
-            assertEquals(PreviewSettings(SceneId.PROCESSING, PreviewFps.SIXTY), repo.state.value.overlay.content)
-        } finally { reopenedScope.coroutineContext[Job]!!.cancelAndJoin() }
-    }
-
-    @Test fun overlaySceneAndFpsWriteFailuresPropagateWithoutOptimisticState() = runTest {
-        val failure = IOException("write denied")
-        val store = object : DataStore<Preferences> {
-            override val data: Flow<Preferences> = flow { emit(emptyPreferences()) }
-            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences = throw failure
-        }
-        val repo = PreferencesSettingsRepository(store, backgroundScope)
-        runCurrent()
-        try { repo.setOverlayScene(SceneId.RAPHAEL); fail("Must propagate write failure") }
-        catch (e: IOException) { assertSame(failure, e) }
-        try { repo.setOverlayFps(PreviewFps.SIXTY); fail("Must propagate write failure") }
-        catch (e: IOException) { assertSame(failure, e) }
-        runCurrent()
-        assertEquals(PreviewSettings.OVERLAY_DEFAULT, repo.state.value.overlay.content)
     }
 }

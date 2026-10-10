@@ -26,7 +26,7 @@ class SceneVariantTest {
             }
         }
         assertEquals(SceneVariant.FULL, PreviewSettings().variant)
-        assertEquals(SceneVariant.FULL, PreviewSettings.WALLPAPER_DEFAULT.variant)
+        assertEquals(SceneVariant.FULL, PreviewSettings(SceneId.IDLE, PreviewFps.SIXTY).variant)
     }
 
     @Test fun entrypointsAcceptExactlyFourQueryForms() {

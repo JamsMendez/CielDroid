@@ -35,9 +35,12 @@ fun CielDroidApp() {
     var pickerUnavailable by rememberSaveable { mutableStateOf(false) }
     var overlayGranted by remember { mutableStateOf(context.canDrawOverlays()) }
     var overlaySettingsUnavailable by rememberSaveable { mutableStateOf(false) }
-    // The user grants the permission in system settings; re-check whenever the launcher resumes.
+    var cielWallpaperActive by remember { mutableStateOf(context.isCielWallpaperActive()) }
+    var chooserUnavailable by rememberSaveable { mutableStateOf(false) }
+    // The user grants the permission and changes the wallpaper in system screens; re-check on every resume.
     LifecycleResumeEffect(Unit) {
         overlayGranted = context.canDrawOverlays()
+        cielWallpaperActive = context.isCielWallpaperActive()
         onPauseOrDispose { }
     }
     val generation = remember(settings.loaded, settings.settings, retry) { vm.nextGeneration() }
@@ -83,20 +86,31 @@ fun CielDroidApp() {
                     OutlinedButton(onClick = { retry++ }, enabled = enabled) { Text(stringResource(R.string.retry)) }
                 }
             }
-            WallpaperSection(
-                wallpaper = settings.wallpaper, enabled = enabled, pickerUnavailable = pickerUnavailable,
-                onSceneSelected = vm::selectWallpaperScene, onFpsSelected = vm::selectWallpaperFps,
-                onSetWallpaper = { pickerUnavailable = !context.openLiveWallpaperPicker() },
-            )
-            OverlaySection(
-                content = settings.overlay.content, contentEnabled = enabled,
-                onSceneSelected = vm::selectOverlayScene, onFpsSelected = vm::selectOverlayFps,
-                granted = overlayGranted, settingsUnavailable = overlaySettingsUnavailable,
-                moveMode = settings.overlay.moveMode, moveModeEnabled = enabled,
-                onMoveModeChange = vm::setOverlayMoveMode,
-                onGrant = { overlaySettingsUnavailable = !context.openOverlayPermissionSettings() },
-                onStart = { if (context.canDrawOverlays()) context.startMiniOverlay() else overlayGranted = false },
-                onStop = { context.stopMiniOverlay() },
+            ModeSection(
+                mode = settings.mode, enabled = enabled,
+                onModeSelected = { mode ->
+                    // Wallpaper mode never leaves the floating mini scene running.
+                    if (mode == ActiveMode.WALLPAPER) context.stopMiniOverlay()
+                    vm.selectMode(mode)
+                },
+                wallpaper = {
+                    WallpaperControls(
+                        enabled = enabled, pickerUnavailable = pickerUnavailable,
+                        onSetWallpaper = { pickerUnavailable = !context.openLiveWallpaperPicker() },
+                    )
+                },
+                mini = {
+                    MiniControls(
+                        granted = overlayGranted, settingsUnavailable = overlaySettingsUnavailable,
+                        moveMode = settings.overlay.moveMode, moveModeEnabled = enabled,
+                        onMoveModeChange = vm::setOverlayMoveMode,
+                        onGrant = { overlaySettingsUnavailable = !context.openOverlayPermissionSettings() },
+                        onStart = { if (context.canDrawOverlays()) context.startMiniOverlay() else overlayGranted = false },
+                        onStop = { context.stopMiniOverlay() },
+                        wallpaperActive = cielWallpaperActive, chooserUnavailable = chooserUnavailable,
+                        onChangeWallpaper = { chooserUnavailable = !context.openWallpaperChooser() },
+                    )
+                },
             )
         }
     }

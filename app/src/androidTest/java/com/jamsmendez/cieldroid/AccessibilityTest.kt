@@ -46,18 +46,30 @@ class AccessibilityTest {
     @Test fun sectionTitlesAreHeadings() {
         launched()
         val heading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
-        listOf(R.string.app_name, R.string.preview_title, R.string.wallpaper_title, R.string.overlay_title)
+        listOf(R.string.app_name, R.string.preview_title, R.string.mode_title)
             .forEach { compose.onNode(hasText(string(it)) and heading).assertExists() }
     }
 
-    // Read-only: the switch is not clicked so the device's persisted move mode stays untouched.
+    private fun modeSelected(tag: String) =
+        compose.onAllNodes(hasTestTag(tag) and isSelected()).fetchSemanticsNodes().isNotEmpty()
+
+    private fun selectMode(tag: String) {
+        compose.onNodeWithTag(tag).performScrollTo().performClick()
+        compose.waitUntil(20_000) { modeSelected(tag) }
+    }
+
+    // The switch is not clicked so the device's persisted move mode stays untouched; the mode is restored.
     @Test fun overlayMoveModeIsOneLabelledSwitch() {
         launched()
-        val row = compose.onNodeWithTag("overlay-move-mode")
-        row.assert(isToggleable())
-        row.assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
-        row.assert(hasText(string(R.string.overlay_move_mode)))
-        row.assert(hasText(string(R.string.overlay_move_mode_explanation)))
+        val original = if (modeSelected("mode-mini")) "mode-mini" else "mode-wallpaper"
+        try {
+            selectMode("mode-mini")
+            val row = compose.onNodeWithTag("overlay-move-mode").performScrollTo()
+            row.assert(isToggleable())
+            row.assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+            row.assert(hasText(string(R.string.overlay_move_mode)))
+            row.assert(hasText(string(R.string.overlay_move_mode_explanation)))
+        } finally { selectMode(original) }
     }
 
     @Test fun sceneChipsShareOneSelectableGroup() {
@@ -67,21 +79,18 @@ class AccessibilityTest {
             .forEach { compose.onNode(hasText(it) and group).assertExists() }
     }
 
-    @Test fun wallpaperChipsAreGroupedAndDescribedApartFromPreviewChips() {
+    @Test fun modeOptionsAreOneSelectableGroupOfRadioButtons() {
         launched()
-        // The options live in a selector opened from the compact summary row.
-        compose.onNodeWithTag("wallpaper-scene-idle").assertDoesNotExist()
-        compose.onNodeWithTag("wallpaper-content").performScrollTo()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)).performClick()
         val group = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
-        listOf("processing", "explorer", "idle", "raphael").forEach {
-            compose.onNode(hasTestTag("wallpaper-scene-$it") and group)
-                .assertContentDescriptionEquals(string(R.string.wallpaper_scene_chip_description, it))
+        val radio = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+        mapOf("mode-wallpaper" to R.string.mode_wallpaper, "mode-mini" to R.string.mode_mini).forEach { (tag, label) ->
+            compose.onNode(hasTestTag(tag) and group and radio and hasText(string(label))).performScrollTo()
+                .assertIsDisplayed()
         }
-        listOf(30, 60).forEach {
-            compose.onNode(hasTestTag("wallpaper-fps-$it") and group)
-                .assertContentDescriptionEquals(string(R.string.wallpaper_fps_chip_description, it))
-        }
+        // Exactly one mode is selected.
+        compose.onAllNodes(hasTestTag("mode-wallpaper") and isSelected()).fetchSemanticsNodes().size
+            .plus(compose.onAllNodes(hasTestTag("mode-mini") and isSelected()).fetchSemanticsNodes().size)
+            .let { assertEquals(1, it) }
     }
 
     @Test fun previewStatusIsPoliteLiveRegion() {

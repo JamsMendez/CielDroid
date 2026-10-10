@@ -24,25 +24,10 @@ class PreviewViewModelTest {
             if (fail) error("disk unavailable")
             state.value = state.value.copy(settings = state.value.settings.copy(fps = fps))
         }
-        override suspend fun setWallpaperScene(scene: SceneId) {
+        override suspend fun setActiveMode(mode: ActiveMode) {
             writes++
             if (fail) error("disk unavailable")
-            state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(scene = scene))
-        }
-        override suspend fun setWallpaperFps(fps: PreviewFps) {
-            writes++
-            if (fail) error("disk unavailable")
-            state.value = state.value.copy(wallpaper = state.value.wallpaper.copy(fps = fps))
-        }
-        override suspend fun setOverlayScene(scene: SceneId) {
-            writes++
-            if (fail) error("disk unavailable")
-            state.value = state.value.copy(overlay = state.value.overlay.copy(content = state.value.overlay.content.copy(scene = scene)))
-        }
-        override suspend fun setOverlayFps(fps: PreviewFps) {
-            writes++
-            if (fail) error("disk unavailable")
-            state.value = state.value.copy(overlay = state.value.overlay.copy(content = state.value.overlay.content.copy(fps = fps)))
+            state.value = state.value.copy(mode = mode)
         }
         override suspend fun setOverlayMoveMode(enabled: Boolean) {
             writes++
@@ -80,31 +65,40 @@ class PreviewViewModelTest {
         } finally { Dispatchers.resetMain() }
     }
 
-    @Test fun wallpaperSelectionIsGatedAndIndependentOfPreview() = runTest {
+    @Test fun modeSelectionIsGatedAndLeavesTheSharedConfigAlone() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
             val repo = Repository()
             val vm = PreviewViewModel(repo)
-            vm.selectWallpaperScene(SceneId.RAPHAEL)
+            assertEquals(ActiveMode.WALLPAPER, vm.settings.value.mode)
+            vm.selectMode(ActiveMode.MINI)
             runCurrent()
             assertEquals(0, repo.writes)
-            repo.state.value = SettingsState(loaded = true)
-            vm.selectWallpaperScene(SceneId.RAPHAEL)
-            vm.selectWallpaperFps(PreviewFps.SIXTY)
+            repo.state.value = SettingsState(settings = PreviewSettings(SceneId.IDLE, PreviewFps.SIXTY), loaded = true)
+            vm.selectMode(ActiveMode.MINI)
             runCurrent()
-            assertEquals(2, repo.writes)
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.wallpaper)
-            assertEquals(PreviewSettings(), vm.settings.value.settings)
+            assertEquals(1, repo.writes)
+            assertEquals(ActiveMode.MINI, vm.settings.value.mode)
+            // One shared config: choosing a mode never changes the scene/FPS the services follow.
+            assertEquals(PreviewSettings(SceneId.IDLE, PreviewFps.SIXTY), vm.settings.value.settings)
+            vm.selectScene(SceneId.RAPHAEL)
+            runCurrent()
+            assertEquals(ActiveMode.MINI, vm.settings.value.mode)
+            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.settings)
             repo.fail = true
-            vm.selectWallpaperScene(SceneId.EXPLORER)
+            vm.selectMode(ActiveMode.WALLPAPER)
             runCurrent()
-            assertEquals(SceneId.RAPHAEL, vm.settings.value.wallpaper.scene)
+            assertEquals(ActiveMode.MINI, vm.settings.value.mode)
             assertNotNull(vm.writeError.value)
             repo.fail = false
-            repo.state.value = repo.state.value.copy(error = IllegalStateException("read failed"))
-            vm.selectWallpaperFps(PreviewFps.THIRTY)
+            vm.selectMode(ActiveMode.WALLPAPER)
             runCurrent()
-            assertEquals(3, repo.writes) // a read error blocks wallpaper writes too
+            assertEquals(ActiveMode.WALLPAPER, vm.settings.value.mode)
+            assertNull(vm.writeError.value)
+            repo.state.value = repo.state.value.copy(error = IllegalStateException("read failed"))
+            vm.selectMode(ActiveMode.MINI)
+            runCurrent()
+            assertEquals(4, repo.writes) // a read error blocks mode writes too
         } finally { Dispatchers.resetMain() }
     }
 
@@ -133,40 +127,6 @@ class PreviewViewModelTest {
             assertFalse(vm.settings.value.overlay.moveMode)
             assertNull(vm.writeError.value)
             assertEquals(3, repo.writes) // the gated first call never wrote
-        } finally { Dispatchers.resetMain() }
-    }
-
-    @Test fun overlaySceneAndFpsSelectionIsGatedAndIndependentOfWallpaper() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        try {
-            val repo = Repository()
-            val vm = PreviewViewModel(repo)
-            vm.selectOverlayScene(SceneId.RAPHAEL)
-            runCurrent()
-            assertEquals(0, repo.writes)
-            repo.state.value = SettingsState(loaded = true)
-            vm.selectOverlayScene(SceneId.RAPHAEL)
-            vm.selectOverlayFps(PreviewFps.SIXTY)
-            runCurrent()
-            assertEquals(2, repo.writes)
-            assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.overlay.content)
-            assertEquals(PreviewSettings.WALLPAPER_DEFAULT, vm.settings.value.wallpaper)
-            assertEquals(PreviewSettings(), vm.settings.value.settings)
-            assertTrue(vm.settings.value.overlay.moveMode) // scene/FPS writes leave the default move mode
-            repo.fail = true
-            vm.selectOverlayFps(PreviewFps.THIRTY)
-            runCurrent()
-            assertEquals(PreviewFps.SIXTY, vm.settings.value.overlay.content.fps)
-            assertNotNull(vm.writeError.value)
-            repo.fail = false
-            vm.selectOverlayScene(SceneId.EXPLORER)
-            runCurrent()
-            assertEquals(SceneId.EXPLORER, vm.settings.value.overlay.content.scene)
-            assertNull(vm.writeError.value)
-            repo.state.value = repo.state.value.copy(error = IllegalStateException("read failed"))
-            vm.selectOverlayFps(PreviewFps.THIRTY)
-            runCurrent()
-            assertEquals(4, repo.writes) // a read error blocks overlay writes too
         } finally { Dispatchers.resetMain() }
     }
 }
