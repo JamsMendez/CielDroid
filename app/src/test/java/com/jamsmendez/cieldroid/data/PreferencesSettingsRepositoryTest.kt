@@ -178,7 +178,7 @@ class PreferencesSettingsRepositoryTest {
         try {
             val repo = PreferencesSettingsRepository(store, scope)
             advanceUntilIdle()
-            assertEquals(OverlaySettings(moveMode = false, position = null), repo.state.value.overlay)
+            assertEquals(OverlaySettings(moveMode = true, position = null), repo.state.value.overlay)
             repo.setOverlayMoveMode(true)
             repo.setOverlayPosition(OverlayPosition(120, 340))
             advanceUntilIdle()

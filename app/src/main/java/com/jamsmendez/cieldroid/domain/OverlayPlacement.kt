@@ -4,7 +4,7 @@ package com.jamsmendez.cieldroid.domain
 data class OverlayPosition(val x: Int, val y: Int)
 
 data class OverlaySettings(
-    val moveMode: Boolean = false,
+    val moveMode: Boolean = true,
     /** Null means the default top-end corner. */
     val position: OverlayPosition? = null,
     /** Scene and FPS, independent of the wallpaper; the service always renders them as MINI. */

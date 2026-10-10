@@ -152,7 +152,7 @@ class PreviewViewModelTest {
             assertEquals(PreviewSettings(SceneId.RAPHAEL, PreviewFps.SIXTY), vm.settings.value.overlay.content)
             assertEquals(PreviewSettings.WALLPAPER_DEFAULT, vm.settings.value.wallpaper)
             assertEquals(PreviewSettings(), vm.settings.value.settings)
-            assertFalse(vm.settings.value.overlay.moveMode)
+            assertTrue(vm.settings.value.overlay.moveMode) // scene/FPS writes leave the default move mode
             repo.fail = true
             vm.selectOverlayFps(PreviewFps.THIRTY)
             runCurrent()

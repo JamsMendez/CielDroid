@@ -146,7 +146,7 @@ transparent WebView generation (wallpaper scene/FPS, MINI), paused on screen off
 proves alpha off-screen only; the overlay window itself is unverified until the user grants the permission.
 O03a: `OverlayPlacement` sizes the WebView at 0.42 × short side inside a 0.95-cropped window
 (4 dp default top-end margin below the status bar; absolute TOP|START coordinates with no inset fitting).
-Persisted `overlay_move_mode` (default off) and `overlay_x`/`overlay_y`; move mode clears
+Persisted `overlay_move_mode` (default on since O03e) and `overlay_x`/`overlay_y`; move mode clears
 FLAG_NOT_TOUCHABLE live and `OverlayFrame` intercepts every touch to drag (clamped, saved on UP/CANCEL),
 so the WebView never gets input. Off = pass-through. Drag/persist/pass-through verified once on device (moto g84).
 O03d: independent `overlay_scene`/`overlay_fps` keys (default idle/30; unset or invalid never falls back to the

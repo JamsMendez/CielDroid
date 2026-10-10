@@ -39,7 +39,7 @@ class PreferencesSettingsRepository(
         val x = values[overlayXKey.name] as? Int
         val y = values[overlayYKey.name] as? Int
         return OverlaySettings(
-            moveMode = values[overlayMoveModeKey.name] as? Boolean ?: false,
+            moveMode = values[overlayMoveModeKey.name] as? Boolean ?: OverlaySettings().moveMode,
             position = if (x != null && y != null && x >= 0 && y >= 0) OverlayPosition(x, y) else null,
             content = decode(values, overlaySceneKey, overlayFpsKey, PreviewSettings.OVERLAY_DEFAULT),
         )

@@ -200,7 +200,7 @@ it); dark ring bases look stronger than the Linux luminance key; fps and energy 
 
 O03a: the scene WebView is 0.42 × the screen short side; the window is 0.95 of that (only the
 outermost edge fade is cropped; the ring disc stays whole) and defaults to the top end, 4 dp
-from the edge below the status bar. "Move mode" (off by default) makes the ring draggable and blocks
+from the edge below the status bar. "Move mode" (on by default) makes the ring draggable and blocks
 touches under it; turn it off to let touches pass through again. The window position
 (`overlay_x`/`overlay_y`, absolute pixels) and the switch (`overlay_move_mode`) persist in the shared
 settings store; the position is restored on start. Clamping it to the screen (on start or a screen-size
