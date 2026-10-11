@@ -1,5 +1,26 @@
 # CielDroid — Compose bootstrap
 
+## Scene source (CielScenes submodule)
+
+`app/src/main/assets/scenes` is a git submodule of
+[CielScenes](https://github.com/JamsMendez/CielScenes), the scene web UI shared
+with CieLinux and CielWin. The submodule gitlink pins the exact revision; the
+byte-copy/SHA256 manifest model below is historical.
+
+```sh
+git clone --recurse-submodules <CielDroid URL>          # fresh clone
+git submodule update --init app/src/main/assets/scenes  # existing clone
+git submodule update --remote app/src/main/assets/scenes  # adopt newer CielScenes
+python3 tools/verify_scene_assets.py
+```
+
+The verifier checks the submodule is checked out, every literal
+`SceneAssets.paths` entry exists as a regular file, no symlink exists in the
+tree, and every local HTML/CSS reference resolves inside assets to an
+allowlisted file. Other submodule files (`README.md`) are packaged but never
+served. Android-only `assets/adaptations/` stays in this repository. Fix shared
+scene files in CielScenes, not here.
+
 C02 provides an Android 15+ (`minSdk 35`) launcher and a text catalog of the
 four original FULL CieLinux scenes: processing, explorer, idle and raphael.
 C03 adds scene/settings domain models, preferences persistence and ViewModel
@@ -9,9 +30,8 @@ and widget behavior remain out of scope.
 
 C04 prepares three unmodified original shared resources under
 `app/src/main/assets/scenes/shared/`: `js/alert-overlay.js`, `fonts/OFL.txt`
-and `fonts/ArchivoBlack-Regular.ttf`. [The inventory](docs/source-assets.json)
-catalogs all 56 originals / 940651 bytes; it is unchanged for C08b.
-C08b byte checks match this inventory, committed upstream and production APK.
+and `fonts/ArchivoBlack-Regular.ttf`. The historical inventory (now [docs/source-assets.json](docs/source-assets.json)
+schema 2) catalogued all 56 originals / 940651 bytes through C08b.
 C05 adds the whole original idle Full/Mini component: 11 unchanged text files
 (175960 bytes) under `app/src/main/assets/scenes/idle/`. Full and Mini share
 these files; Full is default; query or hash `variant=mini` selects Mini;

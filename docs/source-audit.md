@@ -1,10 +1,17 @@
 # Original scene resources preserved for Android
 
+> **Current model:** the scenes are the CielScenes git submodule at
+> `app/src/main/assets/scenes` (pinned by its gitlink), not a copy. Check it with
+> `git submodule update --init app/src/main/assets/scenes` and
+> `python3 tools/verify_scene_assets.py`; adopt upstream changes with
+> `git submodule update --remote app/src/main/assets/scenes`. The verifier no longer
+> reads per-file hashes or supports `--source`. Everything below is historical.
+
 Historical T1 copied the four original CieLinux scene trees without changing bytes,
 headers, layout, CSP or scheduling. This is an audited resource baseline, **not a
 working Android preview**. Android host implementation belongs to later units.
 
-## Verify the copy
+## Verify the copy (historical)
 
 ```sh
 python3 tools/verify_scene_assets.py --source /home/jamsmendez/Documents/OS/CosmicLinux/CieLinux

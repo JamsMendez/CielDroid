@@ -2,7 +2,11 @@ package com.jamsmendez.cieldroid.scenes
 
 import java.util.Collections
 
-/** Literal destinations from docs/source-assets.json; never authorize directory prefixes. */
+/**
+ * Literal CielScenes submodule files (app/src/main/assets/scenes) the loader may serve;
+ * checked by tools/verify_scene_assets.py. Never authorize directory prefixes: other
+ * submodule files (e.g. README.md) are packaged but never served.
+ */
 object SceneAssets {
     val paths: Set<String> = Collections.unmodifiableSet(setOf(
         "scenes/explorer/index.html",

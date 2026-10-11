@@ -1,5 +1,11 @@
 # CielDroid bootstrap constraints
 
+Scenes are the CielScenes git submodule at `app/src/main/assets/scenes`; its gitlink
+is the pin. Never edit shared scene files here (change CielScenes, then
+`git submodule update --remote app/src/main/assets/scenes`). Keep Android-only
+host adaptations in `assets/adaptations/`. `tools/verify_scene_assets.py` checks the
+checkout against the `SceneAssets` allowlist; byte/hash statements below are history.
+
 C03 adds settings/domain, preferences persistence and ViewModel foundations to
 C02's Compose launcher and scene-name catalog. User-facing settings controls,
 preview rendering, overlay, wallpaper and widget integration remain out of scope.
@@ -269,7 +275,7 @@ immutability. Historical C05/C06a/I02 qualifications above remain valid.
 C08b final identity verification/native approval/exact acknowledgement (burned) and
 local commit closed at 9fc80fb, not C09 approval.
 Whole-component import is not Full visual/GPU proof; no runtime controls are added.
-C09 includes the unchanged [verifier](tools/verify_scene_assets.py),
+C09 included the then-unchanged [verifier](tools/verify_scene_assets.py),
 [audit](docs/source-audit.md) and [CI](.github/workflows/android.yml). Both first isolated
 validators, separate committed-upstream/catalog/APK provenance, 13 characterization
 cases and four offline wrapper checks passed; manifests and four JDK 25 requests

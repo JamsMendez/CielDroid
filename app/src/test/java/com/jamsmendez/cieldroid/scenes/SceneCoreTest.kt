@@ -2,7 +2,6 @@ package com.jamsmendez.cieldroid.scenes
 
 import com.jamsmendez.cieldroid.domain.*
 import java.io.File
-import java.security.MessageDigest
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -15,17 +14,16 @@ class SceneCoreTest {
     }
 
     @Test fun inventoryAndOriginalEntrypointsMatch() {
-        val manifest = File("../docs/source-assets.json").readText()
-        val paths = Regex("\"destination_path\": \"app/src/main/assets/([^\"]+)\"")
-            .findAll(manifest).map { it.groupValues[1] }.toSet()
-        assertEquals(56, paths.size)
-        assertEquals(paths, SceneAssets.paths)
+        // The CielScenes submodule gitlink pins the bytes; the allowlist must exist in it.
+        val scenes = File("src/main/assets/scenes")
+        assertTrue("Run git submodule update --init app/src/main/assets/scenes",
+            scenes.resolve("shared").isDirectory)
+        assertEquals(56, SceneAssets.paths.size)
+        SceneAssets.paths.forEach { path ->
+            val file = File("src/main/assets/$path")
+            assertTrue(path, file.isFile && !java.nio.file.Files.isSymbolicLink(file.toPath()))
+        }
         SceneId.entries.forEach {
-            val bytes = File("src/main/assets/scenes/${it.assetId}/index.html").readBytes()
-            val expectedHash = Regex("\"destination_path\": \"app/src/main/assets/scenes/${it.assetId}/index.html\",\\s*\"bytes\": \\d+,\\s*\"sha256\": \"([a-f0-9]+)\"")
-                .find(manifest)!!.groupValues[1]
-            val hash = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { b -> "%02x".format(b) }
-            assertEquals(expectedHash, hash)
             assertTrue(original(it).contains(SceneHtml.ORIGINAL_CSP))
             assertTrue(original(it).contains("src=\"js/${it.readyScript}\""))
             val source = File("src/main/assets/scenes/${it.assetId}/js/${it.readyScript}").readText()
