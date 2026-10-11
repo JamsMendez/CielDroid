@@ -1,0 +1,3 @@
+[submodule "app/src/main/assets/scenes"]
+	path = app/src/main/assets/scenes
+	url = https://github.com/JamsMendez/CielScenes.git

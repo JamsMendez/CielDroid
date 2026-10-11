@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # Scenes come from the CielScenes submodule. If that repository is private,
+          # also pass a token with read access to it (the default GITHUB_TOKEN cannot).
+          submodules: true
       # Match gradle/gradle-daemon-jvm.properties, not just AGP's JDK minimum.
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with:
@@ -22,7 +26,9 @@ jobs:
       - name: Install build SDK
         run: sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4.4.3
-      - name: Verify original assets
+      - name: Test asset verifier
+        run: python3 -m unittest discover -s tools -p 'test_*.py'
+      - name: Verify scene submodule assets
         run: python3 tools/verify_scene_assets.py
       - name: Assemble debug app
         run: ./gradlew :app:assembleDebug

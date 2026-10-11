@@ -23,7 +23,8 @@ persisted settings. No commands execute after runtime release.
 
 ## Security and original bytes
 
-`SceneAssets.paths` remains the immutable 56-file manifest inventory.
+`SceneAssets.paths` remains the immutable 56-file allowlist of CielScenes submodule
+files; other submodule files (e.g. `README.md`) are packaged but never served.
 `ScenePolicy.entry/navigation/resource` is the canonical URL authority: only the
 controlled HTTPS origin, GET and manifest resources reach AssetLoader, with exact
 current-entry navigation. Every rejected/unknown request returns a locally denied

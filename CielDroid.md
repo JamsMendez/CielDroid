@@ -66,7 +66,7 @@ CielDroid/
 │   └── test-plan.md
 ├── app/src/main/
 │   ├── AndroidManifest.xml
-│   ├── assets/scenes/           # escenas auditadas y portadas
+│   ├── assets/scenes/           # submódulo git CielScenes (escenas compartidas)
 │   ├── java/com/cieldroid/
 │   │   ├── MainActivity.kt
 │   │   ├── ui/                  # Compose, pantallas, previews
